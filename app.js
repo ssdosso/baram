@@ -50,7 +50,5 @@ app.on("initialize:before", function(options){
 });
 
 app.on('initialize:transport',function(server){
-    server.sockets.on('connection', function (socket) {
 
-    });
 });

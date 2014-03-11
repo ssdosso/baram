@@ -182,6 +182,7 @@ _.extend(WebServiceManager.prototype, EventEmitter.prototype, {
               var self = this;
               this._server.listen(this.options.port, function () {
                   console.info("Baram server listening on port " + self.options.port);
+                  Baram.getInstance().trigger("initialize:after", {});
                  if(!Baram.getInstance().get('single')) self._worker.onActive();
                   if (Baram.getInstance().get('transport')) {
                       callback.call(Baram.getInstance(),self._server);

@@ -5,6 +5,7 @@ var EventEmitter = process.EventEmitter
     , AWS = require('aws-sdk')
     , async = require('async')
     , io = require('socket.io')
+    , domain = require('domain')
     , assert= require('assert');
 
 exports = module.exports = Transport;
@@ -43,8 +44,22 @@ _.extend(Transport.prototype, EventEmitter.prototype, {
 //            console.log('Transports:', transportsOpt);
 //
            // socketServer.set('transports', transportsOpt);
+           self.events();
 
-            Baram.getInstance().trigger("initialize:transport", self.server);
         });
+    },
+    events : function() {
+        var serverDomain = domain.create();
+        var self = this;
+        serverDomain.on('error', function(err) {
+            console.log("Server Domain Error: " + err);
+        });
+        serverDomain.run(function(){
+            self.server.sockets.on('connection', function (socket) {
+
+            });
+        });
+
+        Baram.getInstance().trigger("initialize:transport", self.server);
     }
 });

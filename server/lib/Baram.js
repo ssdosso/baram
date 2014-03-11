@@ -53,7 +53,7 @@ var BaramService  = {
 
             var scope = this;
             this.trigger("initialize:before", options);
-            this.trigger("initialize:after", options);
+
 
             this.config.start(options.config,this);
 
