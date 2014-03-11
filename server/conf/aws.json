@@ -1,0 +1,22 @@
+{
+    "variants": {
+        "resize": {
+            "mini" : "300x200",
+            "preview": "800x600"
+        },
+        "crop": {
+            "thumb": "200x200"
+        }
+    },
+
+    "storage": {
+        "aws": {
+            "key" : "AKIAIK7222QGV2SD6W7A",
+            "secret" : "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",
+            "bucket" : "blueark-test-00"
+        },
+        "dir": {
+            "path" : "./public/images/"
+        }
+    }
+}
