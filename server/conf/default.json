@@ -3,7 +3,8 @@
      "service" : [ {
          "port" : 80,
          "namespace" : "default",
-         "transport" : true
+         "transport" : true,
+         "transportOptions": {}
         }
      ],
 

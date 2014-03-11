@@ -32,6 +32,7 @@ var BaramService  = {
         this.config = new Baram.config;
         this.storage = new Baram.Storage;
         this.logger =   new Baram.Logger;
+        this.transport = new Baram.Transport;
         this.webServices = {};
     };
 
@@ -69,9 +70,7 @@ var BaramService  = {
         set : function(name,value) {
             this.config[name] = value;
         },
-        setTest: function(val){
-             this.test = val;
-        },
+
         listenService : function(listenInfo,index) {
 
             if (index ==0 && this.config.port) {
@@ -81,8 +80,13 @@ var BaramService  = {
 
             this.webServices[listenInfo.namespace] =  new Baram.WebServiceManager();
             this.webServices[listenInfo.namespace].create(listenInfo);
-            if (Cluster.isWorker || this.config.debug) this.webServices[listenInfo.namespace].listen();
-        }
+            if (Cluster.isWorker || this.config.single) {
+                this.webServices[listenInfo.namespace].listen(function(server){
+                    this.transport.create(server);
+                });
+            }
+        },
+
     });
 
 

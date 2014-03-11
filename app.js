@@ -9,9 +9,7 @@
 
 
 
-var Baram = require('./server/lib/Baram')
-    , Backbone = require('backbone')
-    , _ = require('underscore') ;
+var Baram = require('./server/lib/Baram');
 
 
 
@@ -21,13 +19,6 @@ var app = Baram.getInstance();
 //    app.log.error('App Caught Exception Stack', {err:err,stack:err.stack});
 //});
 
-
-app.on("initialize:after", function(options){
-         //test
-});
-app.on("initialize:before", function(options){
-
-});
 
 app.start({
     config: [
@@ -39,7 +30,7 @@ app.start({
                 return false;
             }
         }},
-        {short:"d",long:"debug",  description:"debug 사용여부 ", value:true, parser:function (value) {
+        {short:"s",long:"single",  description:"debug 사용여부 ", value:true, parser:function (value) {
             if (value == 'true') {
                 return true;
             } else {
@@ -47,5 +38,17 @@ app.start({
             }
         }}
     ]
+
+});
+
+
+app.on("initialize:after", function(options){
+    //test
+});
+app.on("initialize:before", function(options){
+
+});
+
+app.on('initialize:transport',function(server){
 
 });

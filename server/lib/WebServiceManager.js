@@ -47,9 +47,9 @@ _.extend(WebServiceManager.prototype, EventEmitter.prototype, {
                * S3 set
                */
 
-               //webstorm debug 모드가 동작하겠금 설정
-              var debug = Baram.getInstance().config.debug;
-              if (!debug) {
+               //webstorm single 모드가 동작하겠금 설정
+              var single = Baram.getInstance().config.single;
+              if (!single) {
                   if ( Cluster.isWorker ) {
                       this._worker = new ChildServer;
                   } else {
@@ -59,7 +59,7 @@ _.extend(WebServiceManager.prototype, EventEmitter.prototype, {
 
               Baram.getInstance().storage.create();
 
-              if (Cluster.isMaster && !debug) {
+              if (Cluster.isMaster && !single) {
 
                   this._workers = {};
                   for (var i = 0; i < cpus; i++) {
@@ -72,7 +72,7 @@ _.extend(WebServiceManager.prototype, EventEmitter.prototype, {
                          console.log(data)
                   });
               }  else  {
-                  if(!debug) this._worker.create();
+                  if(!single) this._worker.create();
 
                   var port = options.port;
                   if (options.SSL && options.SSL === true) {
@@ -90,6 +90,7 @@ _.extend(WebServiceManager.prototype, EventEmitter.prototype, {
                       Baram.getInstance().info('SSL Server create');
                   } else {
                       this._server = Http.createServer(this.app);
+
                       Baram.getInstance().log.info('http Server create');
                   }
 
@@ -97,8 +98,9 @@ _.extend(WebServiceManager.prototype, EventEmitter.prototype, {
                   serverDomain.on('error', function(err) {
                       console.log("Server Domain Error: " + err);
                   });
+                  this._server.options = options;
                   serverDomain.run(function(){
-                      scope.baseConfigure(server,options);
+                      scope.setConfigure(server,options);
                   });
 
 
@@ -107,7 +109,7 @@ _.extend(WebServiceManager.prototype, EventEmitter.prototype, {
 
 
           },
-         baseConfigure: function(server,options) {
+          setConfigure: function(server,options) {
                 var app = this.app,scope=this;
 
                 var allowCrossDomain =function(req, res, next) {
@@ -130,8 +132,8 @@ _.extend(WebServiceManager.prototype, EventEmitter.prototype, {
                 };
 
                 app.configure(function () {
+                    app.set('options',options);
 
-                    app.set('config',Baram.getInstance().config) ;
                     app.set('port', options.port);
                     app.set('views', process.cwd() + '/server/views');
                     app.set('view engine', 'ejs');
@@ -149,8 +151,8 @@ _.extend(WebServiceManager.prototype, EventEmitter.prototype, {
                         reqDomain.add(req);
                         reqDomain.add(res);
                         reqDomain.on('error', function(err) {
-                            console.log("Req Domain Error: " + err);
-                            scope.log.error('Req Domain Error:',err);
+
+                            Baram.getInstance().log.error('Req Domain Error:',err);
                             reqDomain.dispose();
                             next(err);
                         });
@@ -176,14 +178,19 @@ _.extend(WebServiceManager.prototype, EventEmitter.prototype, {
                 });
 
           },
-          listen : function() {
+          listen : function(callback) {
               var self = this;
               this._server.listen(this.options.port, function () {
-                  console.info("Navin server listening on port " + self.options.port);
-                 if(!Baram.getInstance().config.debug) self._worker.onActive();
+                  console.info("Baram server listening on port " + self.options.port);
+                 if(!Baram.getInstance().get('single')) self._worker.onActive();
+                  if (Baram.getInstance().get('transport')) {
+                      callback.call(Baram.getInstance(),self._server);
+                  }
+
               });
               this._server.on('clientError',function(exception) {
-                 // sv.logger.warn('## WebServer Client Error', {exception:exception});
+
+                  Baram.getInstance().log.error({exception:exception});
                   console.log('## ' + exception);
               });
           }
