@@ -30,7 +30,7 @@ app.start({
                 return false;
             }
         }},
-        {short:"s",long:"single",  description:"debug 사용여부 ", value:true, parser:function (value) {
+        {short:"s",long:"single",  description:"single process 사용여부 ", value:true, parser:function (value) {
             if (value == 'true') {
                 return true;
             } else {
@@ -50,5 +50,7 @@ app.on("initialize:before", function(options){
 });
 
 app.on('initialize:transport',function(server){
+    server.sockets.on('connection', function (socket) {
 
+    });
 });
