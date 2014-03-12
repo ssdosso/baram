@@ -16,7 +16,7 @@ function Router (mgr, name) {
 _.extend(Router.prototype, EventEmitter.prototype, {
            init : function(app) {
               this.app = app;
-              this.config = Baram.getInstance().get('config');
+              this.config = Baram.getInstance().getConfig();
               this.start();
            },
            end : function(variables) {

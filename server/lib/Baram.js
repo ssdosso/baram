@@ -64,8 +64,12 @@ var BaramService  = {
             })
         } ,
         get: function(name) {
-           return this.config[name] ? this.config[name] : this.config
 
+           return this.config[name] ? this.config[name] : null;
+
+        },
+        getConfig: function() {
+          return this.config;
         },
         set : function(name,value) {
             this.config[name] = value;

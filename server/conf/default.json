@@ -4,9 +4,10 @@
          "port" : 80,
          "namespace" : "default",
          "transport" : true,
-         "transportOptions": {}
+         "transportOptions": {},
+         "redis":{"host":"localhost","port":6379}
         }
      ],
 
-    "debug": false
+    "single": false
 }

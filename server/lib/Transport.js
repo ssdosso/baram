@@ -6,6 +6,7 @@ var EventEmitter = process.EventEmitter
     , async = require('async')
     , io = require('socket.io')
     , domain = require('domain')
+    , redis = require('redis')
     , assert= require('assert');
 
 exports = module.exports = Transport;
@@ -18,13 +19,23 @@ function Transport (mgr, name) {
 _.extend(Transport.prototype, EventEmitter.prototype, {
     create : function(server) {
         var self = this;
-
+        var options = function() {
+            return server.options;
+        }
         this.server =  io.listen(server);
         this.server.enable('browser client minification');  // send minified client
         this.server.enable('browser client etag');          // apply etag caching logic based on version number
         this.server.enable('browser client gzip');          // gzi
         this.server.configure(function () {
             self.server.enable('browser client etag');
+
+
+            if (!Baram.getInstance().getConfig().single) {
+                Baram.getInstance().log.info('Redis connect to: '+options().redis.host+':'+options().redis.port);
+                var RedisStore = io.RedisStore,opts = { host: options().redis.host, port: options().redis.port };
+                self.server.set('store', new RedisStore( { redisPub: opts, redisSub: opts, redisClient: opts } ));
+            }
+
 
             if (server.options.transportOptions != null ) {
                 for (var opt in server.options.transportOptions) {
@@ -44,15 +55,15 @@ _.extend(Transport.prototype, EventEmitter.prototype, {
 //            console.log('Transports:', transportsOpt);
 //
            // socketServer.set('transports', transportsOpt);
-           self.events();
+           self.connectionEvent();
 
         });
     },
-    events : function() {
+    connectionEvent : function() {
         var serverDomain = domain.create();
         var self = this;
         serverDomain.on('error', function(err) {
-            console.log("Server Domain Error: " + err);
+            Boram.getInstance().log.error("socket  Error: " + err);
         });
         serverDomain.run(function(){
             self.server.sockets.on('connection', function (socket) {
