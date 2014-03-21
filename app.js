@@ -14,10 +14,6 @@ var Baram = require('./server/lib/Baram');
 
 
 var app = Baram.getInstance();
-//process.on('uncaughtException', function (err) {
-//    //  app.log.exception('App Caught Exception', {err:err});
-//    app.log.error('App Caught Exception Stack', {err:err,stack:err.stack});
-//});
 
 
 app.start({
@@ -44,9 +40,13 @@ app.start({
 
 app.on("initialize:after", function(options){
     //test
+
 });
 app.on("initialize:before", function(options){
 
+    app.configure(function(){
+
+    });
 });
 
 app.on('initialize:transport',function(server){

@@ -16,7 +16,7 @@ function Router (mgr, name) {
 _.extend(Router.prototype, EventEmitter.prototype, {
            init : function(app) {
               this.app = app;
-              this.config = Baram.getInstance().getConfig();
+             // this.config = Baram.getInstance().getConfig();
               this.start();
            },
            end : function(variables) {
@@ -81,7 +81,7 @@ _.extend(Router.prototype, EventEmitter.prototype, {
                     assert(0);
                 }
                 var scope = this
-                    ,url=  data.url ? data.url +'/' + path :this.config.url +'/' + path
+                    ,url=  data.url ? data.url +'/' + path :Baram.getInstance().get('url') +'/' + path
                     ,qs = require('querystring').stringify(data)
                     ,options={};
 

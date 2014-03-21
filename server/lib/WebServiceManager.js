@@ -48,7 +48,8 @@ _.extend(WebServiceManager.prototype, EventEmitter.prototype, {
                */
 
                //webstorm single 모드가 동작하겠금 설정
-              var single = Baram.getInstance().config.single;
+              var single = Baram.getInstance().get('single');
+
               if (!single) {
                   if ( Cluster.isWorker ) {
                       this._worker = new ChildServer;
@@ -183,7 +184,7 @@ _.extend(WebServiceManager.prototype, EventEmitter.prototype, {
               this._server.listen(this.options.port, function () {
                   console.info("Baram server listening on port " + self.options.port);
                   Baram.getInstance().trigger("initialize:after", {});
-                 if(!Baram.getInstance().getConfig().single) self._worker.onActive();
+                 if(!Baram.getInstance().get('single')) self._worker.onActive();
                   if (self.options.transport) {
                       callback.call(Baram.getInstance(),self._server);
                   }

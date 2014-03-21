@@ -90,7 +90,7 @@ _.extend(BlueBucket.prototype, EventEmitter.prototype, {
 
 _.extend(S3storage.prototype, EventEmitter.prototype, {
       create : function() {
-          var config= Baram.getInstance().config.s3;
+//          var config= Baram.getInstance().config.s3;
          // var s3 = new AWS.S3();
          // AWS.config.loadFromPath('./server/conf/s3.json');
 

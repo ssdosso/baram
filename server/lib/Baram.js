@@ -27,12 +27,13 @@ var BaramService  = {
 
 
 
-    Baram.Application = function(options){
+    Baram.Application = function(){
         this.trigger = Baram.triggerMethod;
-        this.config = new Baram.config;
+        this.settings = new Baram.config(new Backbone.Model());
         this.storage = new Baram.Storage;
         this.logger =   new Baram.Logger;
         this.transport = new Baram.Transport;
+        //this.model = new Backbone.Model();
         this.webServices = {};
     };
 
@@ -48,44 +49,50 @@ var BaramService  = {
     _.extend(Baram.Application.prototype,async);
     _.extend(Baram.Application.prototype, EventEmitter.prototype, {
         start: function(options){
-             var fs = require('fs');
-             var path = './async.txt';
 
-            var scope = this;
-            this.trigger("initialize:before", options);
-
-
-            this.config.start(options.config,this);
-
+             var scope = this;
             this.on('ready',function(){
-               for (var key in scope.config.service) {
-                   scope.listenService(scope.config.service[key],key);
-               }
+
+                scope.trigger("initialize:before", {});
+                var service = scope.get('service');
+                for (var key in service) {
+                    scope.listenService(service[key],key);
+                }
             })
+            this.settings.start(options.config,this);
+
+
+
         } ,
         get: function(name) {
-
-           return this.config[name] ? this.config[name] : null;
-
+           return this.settings.get(name);
         },
-        getConfig: function() {
-          return this.config;
+        set: function(name,value) {
+            return this.settings.set(name,value);
         },
-        set : function(name,value) {
-            this.config[name] = value;
+        configure : function(env,fn) {
+
+            var envs,args= [].slice.call(arguments);
+            fn = args.pop();
+            if (args.length) envs = args;
+            fn.call(this);
+
+            return this;
         },
+//        getConfig: function() {
+//          return this.config;
+//        },
 
-        listenService : function(listenInfo,index) {
 
-            if (index ==0 && this.config.port) {
-                listenInfo.port =  this.config.port;
-            }
-            if (!listenInfo.namespace) assert(0,'환경 변수 값에 namespace 값이 존재 해야 함..');
+        listenService : function(info,index) {
 
-            this.webServices[listenInfo.namespace] =  new Baram.WebServiceManager();
-            this.webServices[listenInfo.namespace].create(listenInfo);
-            if (Cluster.isWorker || this.config.single) {
-                this.webServices[listenInfo.namespace].listen(function(server){
+
+            if (!info.namespace) assert(0,'환경 변수 값에 namespace 값이 존재 해야 함..');
+
+            this.webServices[info.namespace] =  new Baram.WebServiceManager();
+            this.webServices[info.namespace].create(info);
+            if (Cluster.isWorker || this.get('single')) {
+                this.webServices[info.namespace].listen(function(server){
                     this.transport.create(server);
                 });
             }

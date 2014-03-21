@@ -1,6 +1,7 @@
 {
 
      "service" : [ {
+         "default":true,
          "port" : 80,
          "namespace" : "default",
          "transport" : true,

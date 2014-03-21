@@ -30,7 +30,7 @@ _.extend(Transport.prototype, EventEmitter.prototype, {
             self.server.enable('browser client etag');
 
 
-            if (!Baram.getInstance().getConfig().single) {
+            if (!Baram.getInstance().get('single')) {
                 Baram.getInstance().log.info('Redis connect to: '+options().redis.host+':'+options().redis.port);
                 var RedisStore = io.RedisStore,opts = { host: options().redis.host, port: options().redis.port };
                 self.server.set('store', new RedisStore( { redisPub: opts, redisSub: opts, redisClient: opts } ));
