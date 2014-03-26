@@ -29,12 +29,22 @@ var BaramService  = {
 
     Baram.Application = function(){
         this.trigger = Baram.triggerMethod;
+
         this.settings = new Baram.config(new Backbone.Model());
         this.storage = new Baram.Storage;
         this.logger =   new Baram.Logger;
         this.transport = new Baram.Transport;
-        //this.model = new Backbone.Model();
         this.webServices = {};
+
+        var scope = this;
+        this.on('ready',function(){
+            scope.logger.init();
+
+            var service = scope.get('service');
+            for (var key in service) {
+                scope.listenService(service[key],key);
+            }
+        })
     };
 
      Baram.Application.prototype.__defineGetter__('log', function () {
@@ -50,15 +60,7 @@ var BaramService  = {
     _.extend(Baram.Application.prototype, EventEmitter.prototype, {
         start: function(options){
 
-             var scope = this;
-            this.on('ready',function(){
-                scope.logger.init();
-                scope.trigger("initialize:before", {});
-                var service = scope.get('service');
-                for (var key in service) {
-                    scope.listenService(service[key],key);
-                }
-            })
+
             this.settings.start(options.config,this);
 
 
@@ -68,6 +70,7 @@ var BaramService  = {
            return this.settings.get(name);
         },
         set: function(name,value) {
+            console.log(name);
             return this.settings.set(name,value);
         },
         configure : function(env,fn) {
@@ -76,12 +79,10 @@ var BaramService  = {
             fn = args.pop();
             if (args.length) envs = args;
             fn.call(this);
+            console.log(fn)
 
             return this;
         },
-//        getConfig: function() {
-//          return this.config;
-//        },
 
 
         listenService : function(info,index) {

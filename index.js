@@ -38,16 +38,18 @@ app.start({
 });
 
 
+/**
+ * port listen 한 후
+ */
 app.on("initialize:after", function(options){
     //test
-
-});
-app.on("initialize:before", function(options){
-
     app.configure(function(){
 
+        app.set('application',true);
+        app.set('appDir','application');
     });
 });
+
 
 app.on('initialize:transport',function(server){
 

@@ -8,6 +8,10 @@
  exports =  module.exports  = BlueConfigure;
  function BlueConfigure(settingModel) {
         this.settingModel = settingModel;
+        this.settingModel.on('change:application',function(state){
+            console.log(state.get('application'))
+        })
+
  }
 
  _.extend(BlueConfigure.prototype, EventEmitter.prototype, {

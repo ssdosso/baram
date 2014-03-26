@@ -45,12 +45,5 @@ _.extend(RouterFactory.prototype, EventEmitter.prototype, {
             }
         });
 
-
-//        for (var m in classes) {
-//
-//            if (undefined === classes[m]) continue;
-//            this.addRouter(m, classes[m]);
-//        }
-
     }
 });
