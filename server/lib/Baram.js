@@ -52,7 +52,7 @@ var BaramService  = {
 
              var scope = this;
             this.on('ready',function(){
-
+                scope.logger.init();
                 scope.trigger("initialize:before", {});
                 var service = scope.get('service');
                 for (var key in service) {

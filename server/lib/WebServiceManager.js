@@ -96,8 +96,12 @@ _.extend(WebServiceManager.prototype, EventEmitter.prototype, {
                   }
 
                   var serverDomain = domain.create();
-                  serverDomain.on('error', function(err) {
-                      console.log("Server Domain Error: " + err);
+                  serverDomain.on('error', function(err,data) {
+
+                      if (err) {
+                          Baram.getInstance().log.error(err.stack);
+                      }
+
                   });
                   this._server.options = options;
                   serverDomain.run(function(){
@@ -153,7 +157,9 @@ _.extend(WebServiceManager.prototype, EventEmitter.prototype, {
                         reqDomain.add(res);
                         reqDomain.on('error', function(err) {
 
-                            Baram.getInstance().log.error('Req Domain Error:',err);
+                            if (err) {
+                                Baram.getInstance().log.error(err.stack);
+                            }
                             reqDomain.dispose();
                             next(err);
                         });
@@ -161,7 +167,7 @@ _.extend(WebServiceManager.prototype, EventEmitter.prototype, {
                         next();
                     });
                     scope.routerFactory = new RouterFactory(app);
-                    scope.routerFactory.addRouters('../routes');
+                    scope.routerFactory.addRouters('routes');
 
                 });
 

@@ -19,12 +19,38 @@ _.extend(RouterFactory.prototype, EventEmitter.prototype, {
     },
     addRouters : function(path) {
 
-        var classes = require(path);
-        for (var m in classes) {
-
-            if (undefined === classes[m]) continue;
-            this.addRouter(m, classes[m]);
+        //var classes = require(path);
+        var self = this;
+        if(!fs.existsSync('routes')) {
+            path = 'server/'+path;
         }
+
+       // console.log(process.cwd());
+//        require(process.cwd()+'/'+path + '/about');
+        fs.readdirSync(path).forEach(function (file) {
+
+            var stats = fs.statSync(process.cwd()+'/'+path + '/' + file);
+            if (stats.isFile()) {
+                var routerClasses = require(process.cwd()+'/'+path + '/' + file);
+
+                var isClassName = false;
+                for (var className in routerClasses) {
+                    isClassName = true;
+                    self.addRouter(className, routerClasses[className]);
+                }
+                if (!isClassName) {
+
+                   console.error(file + ' module.exports does not exist.');
+                }
+            }
+        });
+
+
+//        for (var m in classes) {
+//
+//            if (undefined === classes[m]) continue;
+//            this.addRouter(m, classes[m]);
+//        }
 
     }
 });

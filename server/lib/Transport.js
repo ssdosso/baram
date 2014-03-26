@@ -63,7 +63,9 @@ _.extend(Transport.prototype, EventEmitter.prototype, {
         var serverDomain = domain.create();
         var self = this;
         serverDomain.on('error', function(err) {
-            Boram.getInstance().log.error("socket  Error: " + err);
+            if (err) {
+                Baram.getInstance().log.error(err.stack);
+            }
         });
         serverDomain.run(function(){
             self.server.sockets.on('connection', function (socket) {
