@@ -21,10 +21,10 @@ _.extend(RouterFactory.prototype, EventEmitter.prototype, {
 
         //var classes = require(path);
         var self = this;
-        if(!fs.existsSync('routes')) {
+        if(!fs.existsSync(path)) {
             path = 'server/'+path;
         }
-
+        console.log( fs.readdirSync(path));
        // console.log(process.cwd());
 //        require(process.cwd()+'/'+path + '/about');
         fs.readdirSync(path).forEach(function (file) {

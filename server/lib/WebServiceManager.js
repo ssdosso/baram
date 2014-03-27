@@ -114,6 +114,12 @@ _.extend(WebServiceManager.prototype, EventEmitter.prototype, {
 
 
           },
+          addRouters: function(path) {
+            this.routerFactory.addRouters(path);
+          },
+          addConfigure: function(callback) {
+              callback(this.app);
+          },
           setConfigure: function(server,options) {
                 var app = this.app,scope=this;
 

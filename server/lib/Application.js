@@ -22,7 +22,8 @@ _.extend(Application.prototype, EventEmitter.prototype, {
     },
     addController: function(controller) {
 
-            this._controllers[controller.className] = controller.getInstance();
+        this._controllers[controller.className] = controller.getInstance();
+        this._controllers[controller.className].create();
     },
     addControllers: function() {
         var self = this;

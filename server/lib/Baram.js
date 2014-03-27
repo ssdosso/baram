@@ -35,6 +35,7 @@ var BaramService  = {
         this.logger =   new Baram.Logger;
         this.transport = new Baram.Transport;
         this._webServices = {};
+        this._webIndex = 0;
 
         var scope = this;
         this.on('ready',function(){
@@ -73,6 +74,9 @@ var BaramService  = {
 
 
         },
+        getWebServer: function() {
+            return this._webServices[this._webIndex];
+        },
         get: function(name) {
            return this.settings.get(name);
         },
@@ -97,10 +101,10 @@ var BaramService  = {
 
 //            if (!info.namespace) assert(0,'환경 변수 값에 namespace 값이 존재 해야 함..');
 
-            this._webServices[0] =  new Baram.WebServiceManager();
-            this._webServices[0] .create(service);
+            this._webServices[this._webIndex] =  new Baram.WebServiceManager();
+            this._webServices[this._webIndex] .create(service);
             if (Cluster.isWorker || this.get('single')) {
-                this._webServices[0].listen(function(server){
+                this._webServices[this._webIndex].listen(function(server){
                     this.transport.create(server);
                 });
             }

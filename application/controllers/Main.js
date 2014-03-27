@@ -28,6 +28,14 @@ App.Controller = function(){
 _.extend(App.Controller.prototype,async);
 _.extend(App.Controller.prototype, EventEmitter.prototype, {
     create : function() {
+       var webServer = Baram.getInstance().getWebServer();
+        webServer.addConfigure(
+            function(app) {
+                app.configure(function () {
 
+                });
+            }
+        );
+        webServer.addRouters('application/routers');
     }
 });
