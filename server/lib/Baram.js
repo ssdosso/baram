@@ -17,7 +17,7 @@
 var BaramService  = {
      getInstance: function () {
          if (this._instance === undefined) {
-             this._instance = new  Baram.Application();
+             this._instance = new  Baram.Server();
          }
          return this._instance;
      }
@@ -27,7 +27,7 @@ var BaramService  = {
 
 
 
-    Baram.Application = function(){
+    Baram.Server = function(){
         this.trigger = Baram.triggerMethod;
 
         this.settings = new Baram.config(new Backbone.Model());
@@ -47,7 +47,7 @@ var BaramService  = {
         })
     };
 
-     Baram.Application.prototype.__defineGetter__('log', function () {
+     Baram.Server.prototype.__defineGetter__('log', function () {
          var logger = this.logger;
 
          logger.level =  -1;
@@ -56,17 +56,21 @@ var BaramService  = {
      /**
       * async 모듈함수들을 현재의 객체에 extend 함.
       */
-    _.extend(Baram.Application.prototype,async);
-    _.extend(Baram.Application.prototype, EventEmitter.prototype, {
+    _.extend(Baram.Server.prototype,async);
+    _.extend(Baram.Server.prototype, EventEmitter.prototype, {
         create: function(options){
             this.settings.start(options.config,this);
         } ,
         start: function() {
             console.log(this.get('appDir'))
             if (this.get('appDir')) {
-
-                var app = require(process.cwd()+'/'+this.get('appDir'));
+                this.app = new   Baram.Application;
+                this.app.create();
+                //var app = require(process.cwd()+'/'+this.get('appDir'));
             }
+
+
+
         },
         get: function(name) {
            return this.settings.get(name);
@@ -99,14 +103,16 @@ var BaramService  = {
                     this.transport.create(server);
                 });
             }
-        },
+        }
 
     });
 
 
   Baram.Logger =  require('./Logger');
+
   Baram.Storage = require('./Storage');
   Baram.WebServiceManager =  require('./WebServiceManager');
   Baram.config =  require('./configure');
   Baram.triggerMethod = require('./triggerMethod');
   Baram.Transport = require('./Transport');
+  Baram.Application = require('./Application');
