@@ -8,9 +8,11 @@
  exports =  module.exports  = BlueConfigure;
  function BlueConfigure(settingModel) {
         this.settingModel = settingModel;
-        this.settingModel.on('change:application',function(state){
-            console.log(state.get('application'))
-        })
+//        this.settingModel.on('change:application',function(state){
+//            if (state.get('application') === true) {
+//                console.log(222);
+//            }
+//        })
 
  }
 

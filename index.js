@@ -13,10 +13,10 @@ var Baram = require('./server/lib/Baram');
 
 
 //
-var app = Baram.getInstance();
+var baram = Baram.getInstance();
 
 
-app.start({
+baram.create({
     config: [
         {short:"p",long:"port",description:"port", value:true},
         {short:"c",     long:"cache",           description:"cache 사용여부", value:true, parser:function (value) {
@@ -41,16 +41,18 @@ app.start({
 /**
  * port listen 한 후
  */
-app.on("initialize:after", function(options){
+baram.on("initialize:after", function(options){
     //test
-    app.configure(function(){
+    baram.configure(function(){
 
-        app.set('application',true);
-        app.set('appDir','application');
+        baram.set('application',true);
+        baram.set('appDir','application');
+        baram.start();
+
     });
 });
 
 
-app.on('initialize:transport',function(server){
+baram.on('initialize:transport',function(server){
 
 });

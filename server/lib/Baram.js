@@ -58,19 +58,21 @@ var BaramService  = {
       */
     _.extend(Baram.Application.prototype,async);
     _.extend(Baram.Application.prototype, EventEmitter.prototype, {
-        start: function(options){
-
-
+        create: function(options){
             this.settings.start(options.config,this);
-
-
-
         } ,
+        start: function() {
+            console.log(this.get('appDir'))
+            if (this.get('appDir')) {
+
+                var app = require(process.cwd()+'/'+this.get('appDir'));
+            }
+        },
         get: function(name) {
            return this.settings.get(name);
         },
         set: function(name,value) {
-            console.log(name);
+
             return this.settings.set(name,value);
         },
         configure : function(env,fn) {
@@ -79,7 +81,7 @@ var BaramService  = {
             fn = args.pop();
             if (args.length) envs = args;
             fn.call(this);
-            console.log(fn)
+
 
             return this;
         },
