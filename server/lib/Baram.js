@@ -34,17 +34,18 @@ var BaramService  = {
         this.storage = new Baram.Storage;
         this.logger =   new Baram.Logger;
         this.transport = new Baram.Transport;
-        this.webServices = {};
+        this._webServices = {};
 
         var scope = this;
         this.on('ready',function(){
             scope.logger.init();
 
             var service = scope.get('service');
-            for (var key in service) {
-                scope.listenService(service[key],key);
-            }
-        })
+//            for (var key in service) {
+//                scope.listenService(service[key],key);
+//            }
+            scope.listenService(service);
+        });
     };
 
      Baram.Server.prototype.__defineGetter__('log', function () {
@@ -91,15 +92,15 @@ var BaramService  = {
         },
 
 
-        listenService : function(info,index) {
+        listenService : function(service) {
 
 
-            if (!info.namespace) assert(0,'환경 변수 값에 namespace 값이 존재 해야 함..');
+//            if (!info.namespace) assert(0,'환경 변수 값에 namespace 값이 존재 해야 함..');
 
-            this.webServices[info.namespace] =  new Baram.WebServiceManager();
-            this.webServices[info.namespace].create(info);
+            this._webServices[0] =  new Baram.WebServiceManager();
+            this._webServices[0] .create(service);
             if (Cluster.isWorker || this.get('single')) {
-                this.webServices[info.namespace].listen(function(server){
+                this._webServices[0].listen(function(server){
                     this.transport.create(server);
                 });
             }

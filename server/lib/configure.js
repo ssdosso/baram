@@ -52,14 +52,14 @@
                  case 'port':
 
                      var service = this.settingModel.get('service');
-
-                     for(var i =0; i < service.length; i ++) {
-                         if(service[i].default) {
-                             service[i].port = options[key];
-                         } else {
-                             continue;
-                         }
-                     }
+                     service.port = options[key];
+//                     for(var i =0; i < service.length; i ++) {
+//                         if(service[i].default) {
+//                             service[i].port = options[key];
+//                         } else {
+//                             continue;
+//                         }
+//                     }
                      break;
                  default :
                      this.settingModel.set(key,options[key]);

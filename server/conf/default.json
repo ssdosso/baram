@@ -1,14 +1,14 @@
 {
 
-     "service" : [ {
+     "service" :  {
          "default":true,
          "port" : 80,
          "namespace" : "default",
-         "transport" : true,
+         "transport" : false,
          "transportOptions": {},
          "redis":{"host":"localhost","port":6379}
         }
-     ],
+     ,
     "logDir" :"./logs",
     "application": false,
     "single": true

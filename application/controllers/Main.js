@@ -1,5 +1,11 @@
 
 var App = {},Baram = require('../../server/lib/Baram');
+var Backbone = require('backbone')
+    , _ = require('underscore')
+    , EventEmitter = process.EventEmitter
+    ,  Cluster = require('cluster')
+    , async = require('async');
+
 var MainController =  {
     className: 'main',
     getInstance : function() {
@@ -18,3 +24,10 @@ App.Controller = function(){
 
 }
 
+
+_.extend(App.Controller.prototype,async);
+_.extend(App.Controller.prototype, EventEmitter.prototype, {
+    create : function() {
+
+    }
+});
