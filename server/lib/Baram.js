@@ -62,9 +62,9 @@ var BaramService  = {
             this.settings.start(options.config,this);
         } ,
         start: function() {
-            console.log(this.get('appDir'))
+
             if (this.get('appDir')) {
-                this.app = new   Baram.Application;
+                this.app = new Baram.Application;
                 this.app.create();
                 //var app = require(process.cwd()+'/'+this.get('appDir'));
             }

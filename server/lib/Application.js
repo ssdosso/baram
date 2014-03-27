@@ -20,8 +20,8 @@ _.extend(Application.prototype, EventEmitter.prototype, {
         this.appDir = Baram.getInstance().get('appDir');
         this.addControllers();
     },
-    addController: function(name, Controller) {
-            this._controllers[name] = new Controller();
+    addController: function(name, controller) {
+         //   this._controllers[name] = controller.getInstance();
     },
     addControllers: function() {
         var self = this;
@@ -37,7 +37,7 @@ _.extend(Application.prototype, EventEmitter.prototype, {
                var isClassName = false;
                for (var className in Classes) {
                    isClassName = true;
-                   self.addRouter(className, Classes[className]);
+                  // self.addController(className, Classes[className]);
                }
            }
         });
