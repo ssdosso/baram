@@ -1,6 +1,7 @@
 
 var App = {};
 var MainController =  {
+    className: 'main',
     getInstance : function() {
         if (this._instance === undefined) {
             this._instance = new App.Controller();
@@ -8,7 +9,7 @@ var MainController =  {
         return this._instance;
     }
 }
-module.exports = MainController;
+ module.exports = MainController;
 
 
 App.Controller = function(){

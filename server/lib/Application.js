@@ -20,8 +20,9 @@ _.extend(Application.prototype, EventEmitter.prototype, {
         this.appDir = Baram.getInstance().get('appDir');
         this.addControllers();
     },
-    addController: function(name, controller) {
-         //   this._controllers[name] = controller.getInstance();
+    addController: function(controller) {
+
+            this._controllers[controller.className] = controller.getInstance();
     },
     addControllers: function() {
         var self = this;
@@ -33,12 +34,14 @@ _.extend(Application.prototype, EventEmitter.prototype, {
 
            var stats = fs.statSync(process.cwd()+'/'+ self.appDir + '/controllers/'+ file);
            if (stats.isFile()) {
-               var Classes = require(process.cwd()+'/'+ self.appDir + '/controllers/'+ file);
-               var isClassName = false;
-               for (var className in Classes) {
-                   isClassName = true;
-                  // self.addController(className, Classes[className]);
-               }
+               var singletonController = require(process.cwd()+'/'+ self.appDir + '/controllers/'+ file);
+
+                if(!singletonController.className) {
+                    Baram.getInstance().log.error('not find className');
+                    return;
+                }
+                  self.addController(singletonController);
+
            }
         });
 
