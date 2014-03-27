@@ -1,5 +1,5 @@
 
-var App = {};
+var App = {},Baram = require('../../server/lib/Baram');
 var MainController =  {
     className: 'main',
     getInstance : function() {
@@ -13,6 +13,8 @@ var MainController =  {
 
 
 App.Controller = function(){
+    Baram.getInstance().log.info('MainController Start');
+
 
 }
 
