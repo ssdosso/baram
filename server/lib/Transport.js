@@ -2,6 +2,8 @@ var EventEmitter = process.EventEmitter
     ,_ = require('underscore')
     , fs = require('fs')
     , Baram = require('./Baram')
+
+    , Base = require('./Base')
     , AWS = require('aws-sdk')
     , async = require('async')
     , io = require('socket.io')
@@ -12,11 +14,11 @@ var EventEmitter = process.EventEmitter
 exports = module.exports = Transport;
 
 function Transport (mgr, name) {
-    this.trigger = require('./triggerMethod');
+    Base.prototype.constructor.apply(this,arguments);
 
 };
 
-_.extend(Transport.prototype, EventEmitter.prototype, {
+Baram.extend(Transport.prototype, Base.prototype, {
     create : function(server) {
         var self = this;
         var options = function() {

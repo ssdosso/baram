@@ -3,11 +3,13 @@ var EventEmitter = process.EventEmitter
     , fs = require('fs')
     , Baram = require('./Baram')
     , winston = require('winston')
+    , Base = require('./Base')
     , assert= require('assert');
 
 exports = module.exports = Logger;
 
 function Logger (mgr, name) {
+    Base.prototype.constructor.apply(this,arguments);
     this.options = {
         log:true,
         info:true,
@@ -16,14 +18,11 @@ function Logger (mgr, name) {
         console:true,
         mail:true
     };
-    this.trigger = require('./triggerMethod');
-    //this.init();
 
-  // setInterval(this.init,84600 * 1000)
 
 };
 
-_.extend(Logger.prototype, EventEmitter.prototype, {
+Baram.extend(Logger.prototype, Base.prototype, {
         init : function() {
             this._createLogFile();
 

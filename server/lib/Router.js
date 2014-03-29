@@ -4,22 +4,27 @@ var EventEmitter = process.EventEmitter
     , request = require('request')
     , winston = require('winston')
     ,Baram = require('./Baram')
+    , Base = require('./Base')
     , assert= require('assert');
 
 
 exports= module.exports = Router;
 function Router (mgr, name) {
 
-
+    this.base();
 };
 
-_.extend(Router.prototype, EventEmitter.prototype, {
+
+Baram.extend(Router.prototype, Base.prototype, {
            init : function(app) {
-              this.app = app;
-             // this.config = Baram.getInstance().getConfig();
+                this.app = app;
+
               this.start();
            },
-           end : function(variables) {
+            test : function() {
+                console.log(333);
+            },
+            end : function(variables) {
 
                var args = Array.prototype.slice.apply(arguments.callee.caller.arguments);
                if (args.length < 1) {
@@ -43,6 +48,7 @@ _.extend(Router.prototype, EventEmitter.prototype, {
            },
            get : function(path,callback) {
                 var self = this;
+
                this.app.get(path,function(){
                    callback.apply(self,arguments);
                });

@@ -1,7 +1,9 @@
 var EventEmitter = process.EventEmitter
     ,_ = require('underscore')
     , fs = require('fs')
-    , winston = require('winston')
+    , Baram = require('./Baram')
+  
+    , Base = require('./Base')
     , assert= require('assert');
 
 exports = module.exports = RouterFactory;
@@ -12,7 +14,7 @@ function RouterFactory (app) {
     this._routers = {};
 };
 
-_.extend(RouterFactory.prototype, EventEmitter.prototype, {
+Baram.extend(RouterFactory.prototype, Base.prototype, {
     addRouter:function (name, router) {
         this._routers[name] = new router();
         this._routers[name].init(this.app);

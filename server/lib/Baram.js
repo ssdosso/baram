@@ -6,6 +6,7 @@
      , _ = require('underscore')
      , EventEmitter = process.EventEmitter
      ,  Cluster = require('cluster')
+     , Base = require('./Base')
      , async = require('async');
 
  var Baram = {};
@@ -25,10 +26,12 @@ var BaramService  = {
 
     exports = module.exports =  BaramService;
 
-
+    Baram.extend = function(obj,parent) {
+        _.extend.apply(this,arguments);
+    }
 
     Baram.Server = function(){
-        this.trigger = Baram.triggerMethod;
+        Base.prototype.constructor.apply(this,arguments);
 
         this.settings = new Baram.config(new Backbone.Model());
         this.storage = new Baram.Storage;
@@ -42,9 +45,7 @@ var BaramService  = {
             scope.logger.init();
 
             var service = scope.get('service');
-//            for (var key in service) {
-//                scope.listenService(service[key],key);
-//            }
+
             scope.listenService(service);
         });
     };
@@ -58,8 +59,8 @@ var BaramService  = {
      /**
       * async 모듈함수들을 현재의 객체에 extend 함.
       */
-    _.extend(Baram.Server.prototype,async);
-    _.extend(Baram.Server.prototype, EventEmitter.prototype, {
+
+     Baram.extend(Baram.Server.prototype, Base.prototype, {
         create: function(options){
             this.settings.start(options.config,this);
         } ,
@@ -73,6 +74,9 @@ var BaramService  = {
 
 
 
+        },
+        extend: function(d) {
+            console.log(d)
         },
         getWebServer: function() {
             return this._webServices[this._webIndex];
@@ -112,6 +116,21 @@ var BaramService  = {
 
     });
 
+
+
+
+//
+//(function(){
+//    var root = this;
+//    var Base= function() {}
+//    exports = module.exports = Base;
+//    Base.extend = function() {
+//
+//    }
+//
+//}).call(this);
+
+exports.extend = Baram.extend;
 
   Baram.Logger =  require('./Logger');
 

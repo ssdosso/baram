@@ -2,6 +2,8 @@ var EventEmitter = process.EventEmitter
     ,_ = require('underscore')
     , fs = require('fs')
     , Baram = require('./Baram')
+
+    , Base = require('./Base')
     , AWS = require('aws-sdk')
     , async = require('async')
     , assert= require('assert');
@@ -18,8 +20,8 @@ var BlueBucket = function(optoins) {
 
        this.s3 =  new AWS.S3({Bucket:this.bucket});
 }
-_.extend(BlueBucket.prototype,async);
-_.extend(BlueBucket.prototype, EventEmitter.prototype, {
+
+Baram.extend(BlueBucket.prototype, Base.prototype, {
     getProfile: function() {
         var self = this;
         var param = {
@@ -88,7 +90,7 @@ _.extend(BlueBucket.prototype, EventEmitter.prototype, {
 });
 
 
-_.extend(S3storage.prototype, EventEmitter.prototype, {
+Baram.extend(S3storage.prototype, EventEmitter.prototype, {
       create : function() {
 //          var config= Baram.getInstance().config.s3;
          // var s3 = new AWS.S3();

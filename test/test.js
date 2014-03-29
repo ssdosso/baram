@@ -12,20 +12,30 @@
 //
 //});
 
+var Baram = require('../server/lib/Baram');
+var Base = require('../server/lib/Base');
+function baramTest() {
 
-//function add (a, b) {
-//    console.log("a: " + a);
-//    console.log("b: " + b);
-//    return a + b;
-//};
-//var todo = add.bind(null, 5);
-//console.log(todo(7));
+    this.test();
+}
+Baram.extend(baramTest.prototype,Base.prototype,{
+    test : function() {
 
+        this.callParent('test');
+    },
 
-function a(month,day) {
-    var list = [31,28,31,30];
+})
+function subClass() {
+    this.base();
 
 }
 
+Baram.extend(subClass.prototype,baramTest.prototype,{
+    test : function() {
+        this.callParent('test');
+    }
+})
 
-a(4)
+var d = new subClass;
+
+

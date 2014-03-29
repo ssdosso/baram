@@ -3,6 +3,7 @@ var EventEmitter = process.EventEmitter
     , fs = require('fs')
     , Express = require('express')
     , Baram = require('./Baram')
+    , Base = require('./Base')
     , Https = require('https')
     , Http = require('http')
     , path = require('path')
@@ -23,7 +24,7 @@ exports =  module.exports  = WebServiceManager;
 
 function WebServiceManager() {
     "use strict";
-    this.trigger = require('./triggerMethod');
+    Base.prototype.constructor.apply(this,arguments);
     if (Cluster.isWorker) {
         this._worker = new ChildServer;
     } else {
@@ -32,7 +33,7 @@ function WebServiceManager() {
 
 }
 
-_.extend(WebServiceManager.prototype, EventEmitter.prototype, {
+Baram.extend(WebServiceManager.prototype, Base.prototype, {
           _service:null,
           _workers :null,
           _worker:null,

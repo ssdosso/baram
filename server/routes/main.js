@@ -3,6 +3,7 @@ var EventEmitter = process.EventEmitter
     , fs = require('fs')
     , request = require('request')
     , winston = require('winston')
+    , Baram = require('../lib/Baram')
     , assert= require('assert');
 
 var Router = require('../lib/Router');
@@ -16,9 +17,12 @@ exports.MainRouter  = MainRouter;
 
 function MainRouter () {
 
+    this.base();
+
 };
 
-_.extend(MainRouter.prototype, Router.prototype, {
+Baram.extend(MainRouter.prototype, Router.prototype, {
+
     start : function() {
 
         this.get('/', function(req,res){

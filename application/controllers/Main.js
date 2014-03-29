@@ -1,5 +1,7 @@
 
-var App = {},Baram = require('../../server/lib/Baram');
+var App = {}
+    ,Baram = require('../../server/lib/Baram')
+    ,Application = require('../../server/lib/Application');
 var Backbone = require('backbone')
     , _ = require('underscore')
     , EventEmitter = process.EventEmitter
@@ -20,13 +22,13 @@ var MainController =  {
 
 App.Controller = function(){
     Baram.getInstance().log.info('MainController Start');
-
+    Application.prototype.constructor.apply(this,arguments);
 
 }
 
 
-_.extend(App.Controller.prototype,async);
-_.extend(App.Controller.prototype, EventEmitter.prototype, {
+
+Baram.extend(App.Controller.prototype, Application.prototype, {
     create : function() {
        var webServer = Baram.getInstance().getWebServer();
         webServer.addConfigure(

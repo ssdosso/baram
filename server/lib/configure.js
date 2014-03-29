@@ -2,21 +2,18 @@
      ,_ = require('underscore')
      , Optparse = require('./optparse')
      , fs = require('fs')
+     , Base = require('./Base')
      , Baram = require('./Baram')
      , assert= require('assert');
 
  exports =  module.exports  = BlueConfigure;
  function BlueConfigure(settingModel) {
-        this.settingModel = settingModel;
-//        this.settingModel.on('change:application',function(state){
-//            if (state.get('application') === true) {
-//                console.log(222);
-//            }
-//        })
+     Base.prototype.constructor.apply(this,arguments);
+     this.settingModel = settingModel;
+
 
  }
-
- _.extend(BlueConfigure.prototype, EventEmitter.prototype, {
+ Baram.extend(BlueConfigure.prototype, Base.prototype, {
          start : function(options) {
              var scope = this;
              this.jsonReadSettings( 'conf', function () {
