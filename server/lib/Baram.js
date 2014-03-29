@@ -66,8 +66,8 @@ var BaramService  = {
         start: function() {
 
             if (this.get('appDir')) {
-                this.app = new Baram.Application;
-                this.app.create();
+                this.ApplicationFactory = new Baram.ApplicationFactory;
+                this.ApplicationFactory.create();
                 //var app = require(process.cwd()+'/'+this.get('appDir'));
             }
 
@@ -120,4 +120,4 @@ var BaramService  = {
   Baram.config =  require('./configure');
   Baram.triggerMethod = require('./triggerMethod');
   Baram.Transport = require('./Transport');
-  Baram.Application = require('./Application');
+  Baram.ApplicationFactory = require('./ApplicationFactory');

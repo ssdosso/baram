@@ -24,7 +24,7 @@ _.extend(RouterFactory.prototype, EventEmitter.prototype, {
         if(!fs.existsSync(path)) {
             path = 'server/'+path;
         }
-        console.log( fs.readdirSync(path));
+
        // console.log(process.cwd());
 //        require(process.cwd()+'/'+path + '/about');
         fs.readdirSync(path).forEach(function (file) {
