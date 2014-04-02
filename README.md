@@ -1,4 +1,6 @@
 Web Application Framework for Node.js
+
+Express, Socket.io, Backbone.JS
 ### Server Start Options ###
 -p port    // 사용할 포트 
 
