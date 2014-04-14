@@ -18,7 +18,7 @@ function Transport (mgr, name) {
 
 };
 
-Baram.extend(Transport.prototype, Base.prototype, {
+_.extend(Transport.prototype, Base.prototype, {
     create : function(server) {
         var self = this;
         var options = function() {

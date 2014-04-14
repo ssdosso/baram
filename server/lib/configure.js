@@ -13,7 +13,7 @@
 
 
  }
- Baram.extend(BlueConfigure.prototype, Base.prototype, {
+ _.extend(BlueConfigure.prototype, Base.prototype, {
          start : function(options) {
              var scope = this;
              this.jsonReadSettings( 'conf', function () {

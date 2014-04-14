@@ -21,7 +21,7 @@ var BlueBucket = function(optoins) {
        this.s3 =  new AWS.S3({Bucket:this.bucket});
 }
 
-Baram.extend(BlueBucket.prototype, Base.prototype, {
+_.extend(BlueBucket.prototype, Base.prototype, {
     getProfile: function() {
         var self = this;
         var param = {
@@ -90,7 +90,7 @@ Baram.extend(BlueBucket.prototype, Base.prototype, {
 });
 
 
-Baram.extend(S3storage.prototype, EventEmitter.prototype, {
+_.extend(S3storage.prototype, EventEmitter.prototype, {
       create : function() {
 //          var config= Baram.getInstance().config.s3;
          // var s3 = new AWS.S3();

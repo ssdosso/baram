@@ -15,7 +15,7 @@ function Router (mgr, name) {
 };
 
 
-Baram.extend(Router.prototype, Base.prototype, {
+_.extend(Router.prototype, Base.prototype, {
            init : function(app) {
                 this.app = app;
 
@@ -145,3 +145,5 @@ Baram.extend(Router.prototype, Base.prototype, {
             }
 
 });
+
+Router.extend = Baram.extend;

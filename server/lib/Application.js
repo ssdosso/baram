@@ -12,10 +12,11 @@ var EventEmitter = process.EventEmitter
 exports= module.exports = Application;
 
 function Application() {
-    Base.prototype.constructor.apply(this,arguments);
+    Base.prototype.constructor.apply(this,['start']);
  }
+_.extend(Application.prototype, Base.prototype, {
 
-Baram.extend(Application.prototype,Base.prototype,{
+});
 
+Application.extend = Baram.extend;
 
-})

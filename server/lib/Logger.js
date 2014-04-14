@@ -22,7 +22,7 @@ function Logger (mgr, name) {
 
 };
 
-Baram.extend(Logger.prototype, Base.prototype, {
+_.extend(Logger.prototype, Base.prototype, {
         init : function() {
             this._createLogFile();
 

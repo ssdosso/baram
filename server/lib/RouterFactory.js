@@ -14,7 +14,7 @@ function RouterFactory (app) {
     this._routers = {};
 };
 
-Baram.extend(RouterFactory.prototype, Base.prototype, {
+_.extend(RouterFactory.prototype, Base.prototype, {
     addRouter:function (name, router) {
         this._routers[name] = new router();
         this._routers[name].init(this.app);

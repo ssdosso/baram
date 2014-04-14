@@ -33,7 +33,7 @@ function WebServiceManager() {
 
 }
 
-Baram.extend(WebServiceManager.prototype, Base.prototype, {
+_.extend(WebServiceManager.prototype, Base.prototype, {
           _service:null,
           _workers :null,
           _worker:null,

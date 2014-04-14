@@ -1,12 +1,11 @@
 
 var App = {}
     ,Baram = require('../../server/lib/Baram')
+    , Express = require('express')
     ,Application = require('../../server/lib/Application');
+
 var Backbone = require('backbone')
-    , _ = require('underscore')
-    , EventEmitter = process.EventEmitter
-    ,  Cluster = require('cluster')
-    , async = require('async');
+    , _ = require('underscore');
 
 var MainController =  {
     className: 'main',
@@ -20,24 +19,19 @@ var MainController =  {
  module.exports = MainController;
 
 
-App.Controller = function(){
-    Baram.getInstance().log.info('MainController Start');
-    Application.prototype.constructor.apply(this,arguments);
+ App.Controller = Application.extend({
+        create : function() {
 
-}
+            var webServer = Baram.getInstance().getWebServer();
+            webServer.addConfigure(
+                function(app) {
+                    app.configure(function () {
 
-
-
-Baram.extend(App.Controller.prototype, Application.prototype, {
-    create : function() {
-       var webServer = Baram.getInstance().getWebServer();
-        webServer.addConfigure(
-            function(app) {
-                app.configure(function () {
-
-                });
-            }
-        );
-        webServer.addRouters('application/routers');
-    }
-});
+                        app.use(Express.static(process.cwd() + '/application/public', { maxAge: 31557600000 }));
+                        app.set('views', process.cwd() + '/application/views');
+                    });
+                }
+            );
+            webServer.addRouters('application/routers');
+        }
+})

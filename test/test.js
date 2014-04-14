@@ -12,30 +12,93 @@
 //
 //});
 
-var Baram = require('../server/lib/Baram');
-var Base = require('../server/lib/Base');
+var _ = require('underscore');
+
 function baramTest() {
 
-    this.test();
+    //this.test();
 }
-Baram.extend(baramTest.prototype,Base.prototype,{
-    test : function() {
+//Baram.extend(baramTest.prototype,Base.prototype,{
+//    test : function() {
+//
+//        this.callParent('test');
+//    },
+//
+//})
+//function subClass() {
+//    this.base();
+//
+//}
+//
+//Baram.extend(subClass.prototype,baramTest.prototype,{
+//    test : function() {
+//        this.callParent('test');
+//    }
+//})
+//
+//var d = new subClass;
 
-        this.callParent('test');
+
+
+function Base() {
+
+    console.log(111);
+
+}
+
+_.extend(Base.prototype, {
+
+    callParent : function(method) {
+         this.$owner[method].apply(this,arguments.callee.caller.arguments)
     },
 
-})
-function subClass() {
-    this.base();
+    super : function() {
+          console.log(1212);
+    },
+    base : function() {
+
+
+
+        //this.$owner.constructor.apply(this,arguments)
+    }
+
+});
+
+
+var Baram = {};
+
+Baram.extend = function(def,superClass) {
+    if (Base == superClass.constructor) {
+
+        // console.log(superClass.constructor);
+      //  superClass.constructor.apply(this,arguments);
+    }
+    if(superClass.$owner) {
+        console.log(111);
+    }
+    def.$owner = superClass;
+    _.extend.apply(this,arguments);
+
+}
+Baram.Server = function() {
 
 }
 
-Baram.extend(subClass.prototype,baramTest.prototype,{
-    test : function() {
-        this.callParent('test');
+Baram.extend(Baram.Server.prototype, Base.prototype, {
+    super : function() {
+        console.log(3333)
     }
-})
+});
 
-var d = new subClass;
+Baram.Test = function() {
 
+}
 
+Baram.extend(Baram.Test.prototype, Baram.Server.prototype, {
+    super : function() {
+        Baram.Server.prototype.super.apply(this,arguments)
+    }
+});
+
+var a = new Baram.Test();
+a.super();

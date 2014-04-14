@@ -8,21 +8,18 @@ var EventEmitter = process.EventEmitter
 var Router = require('../../server/lib/Router');
 
 
+var MainRouter = Router.extend(
+    {
+        start : function() {
+
+            this.get('/test', function(req,res){
+                this.end({layout:'sample'});
+            });
+        }
+    })
+
 /**
  * 필수   exports, 라우터 네임
  * @type {Function}
  */
 exports.subRouter  = MainRouter;
-
-function MainRouter () {
-
-};
-
-_.extend(MainRouter.prototype, Router.prototype, {
-    start : function() {
-
-        this.get('/test', function(req,res){
-            this.end({layout:'index'});
-        });
-    }
-});

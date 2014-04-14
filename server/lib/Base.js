@@ -4,7 +4,9 @@ var EventEmitter = process.EventEmitter
     , Baram = require('./Baram')
     , async = require('async')
     , assert= require('assert');
+
 exports = module.exports = Base;
+
 
 function Base() {
 

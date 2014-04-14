@@ -21,7 +21,7 @@ function MainRouter () {
 
 };
 
-Baram.extend(MainRouter.prototype, Router.prototype, {
+_.extend(MainRouter.prototype, Router.prototype, {
 
     start : function() {
 

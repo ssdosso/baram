@@ -11,6 +11,18 @@
 
  var Baram = {};
 
+function Class() { }
+Class.prototype.construct = function() {};
+Class.__asMethod__ = function(func, superClass) {
+    return function() {
+        var currentSuperClass = this.$;
+        this.$ = superClass;
+        var ret = func.apply(this, arguments);
+        this.$ = currentSuperClass;
+        return ret;
+    };
+};
+
  /**
   * singleton Object
   * @type {{getInstance: Function}}
@@ -26,11 +38,13 @@ var BaramService  = {
 
     exports = module.exports =  BaramService;
 
-    Baram.extend = function(obj,parent) {
-        _.extend.apply(this,arguments);
-    }
 
-    Baram.Server = function(){
+
+
+
+
+
+    Baram.Server = function() {
         Base.prototype.constructor.apply(this,arguments);
 
         this.settings = new Baram.config(new Backbone.Model());
@@ -50,20 +64,25 @@ var BaramService  = {
         });
     };
 
-     Baram.Server.prototype.__defineGetter__('log', function () {
-         var logger = this.logger;
+Baram.Server.prototype.__defineGetter__('log', function () {
+    var logger = this.logger;
 
-         logger.level =  -1;
-         return logger;
-     });
+    logger.level =  -1;
+    return logger;
+});
+
+
+
      /**
       * async 모듈함수들을 현재의 객체에 extend 함.
       */
 
-     Baram.extend(Baram.Server.prototype, Base.prototype, {
+     _.extend(Baram.Server.prototype, Base.prototype, {
         create: function(options){
+
             this.settings.start(options.config,this);
         } ,
+
         start: function() {
 
             if (this.get('appDir')) {
@@ -119,18 +138,41 @@ var BaramService  = {
 
 
 
-//
-//(function(){
-//    var root = this;
-//    var Base= function() {}
-//    exports = module.exports = Base;
-//    Base.extend = function() {
-//
-//    }
-//
-//}).call(this);
+var extend = function(protoProps, staticProps) {
+    var parent = this;
+    var child;
 
-exports.extend = Baram.extend;
+    // The constructor function for the new subclass is either defined by you
+    // (the "constructor" property in your `extend` definition), or defaulted
+    // by us to simply call the parent's constructor.
+    if (protoProps && _.has(protoProps, 'constructor')) {
+        child = protoProps.constructor;
+    } else {
+        child = function(){ return parent.apply(this, arguments); };
+    }
+
+    // Add static properties to the constructor function, if supplied.
+    _.extend(child, parent, staticProps);
+
+    // Set the prototype chain to inherit from `parent`, without calling
+    // `parent`'s constructor function.
+    var Surrogate = function(){ this.constructor = child; };
+    Surrogate.prototype = parent.prototype;
+    child.prototype = new Surrogate;
+
+    // Add prototype properties (instance properties) to the subclass,
+    // if supplied.
+    if (protoProps) _.extend(child.prototype, protoProps);
+
+    // Set a convenience property in case the parent's prototype is needed
+    // later.
+    child.__super__ = parent.prototype;
+
+    return child;
+};
+
+  exports.extend = extend;
+
 
   Baram.Logger =  require('./Logger');
 
