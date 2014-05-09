@@ -106,6 +106,23 @@ _.extend(WebServiceManager.prototype, Base.prototype, {
                   });
                   this._server.options = options;
                   serverDomain.run(function(){
+                      if (typeof app.configure !== 'function') {
+                         Baram.getInstance().set('express',4);
+
+                          app.configure = function(callback) {
+                            if (typeof callback === 'string') {
+                                callback = arguments[1];
+                                callback();
+                                console.log();
+                            } else {
+                                callback();
+                            }
+
+                          }
+                      } else {
+                          Baram.getInstance().set('express',3);
+                      }
+
                       scope.setConfigure(server,options);
                   });
 
@@ -145,18 +162,48 @@ _.extend(WebServiceManager.prototype, Base.prototype, {
 
                 app.configure(function () {
                     app.set('options',options);
-
                     app.set('port', options.port);
                     app.set('views', process.cwd() + '/server/views');
                     app.set('view engine', 'ejs');
                     app.engine('ejs', engine);
-                    app.use(Express.cookieParser('1234'));
-                    app.use(Express.cookieSession());
-                    app.use(Express.compress());
 
-                    app.use(Express.methodOverride());
-                    app.use(Express.json());
-                    app.use(Express.urlencoded());
+                    if ( Baram.getInstance().get('express') > 3) {
+                        var cookieParser = require('cookie-parser');
+                        var session = require('cookie-session');
+                        var bodyParser = require('body-parser');
+
+                        app.use(bodyParser()); // pull information from html in POST
+                        app.use(bodyParser.json());
+                        app.use(bodyParser.urlencoded());
+                        //테스트 필요...
+                        app.use(session({
+                            keys: ['key1', 'key2'],
+                            secureProxy: true // if you do SSL outside of node
+                        }))
+                        app.use(function (req, res, next) {
+                            var n = req.session.views || 0
+                            req.session.views = ++n
+                            res.end(n + ' views')
+                        })
+                        var compress = require('compression');
+                        app.use(compress());
+                        app.use(require('method-override')())
+
+                    } else {
+                        app.use(Express.cookieParser('1234'));
+                        app.use(Express.cookieSession());
+                        app.use(Express.compress());
+                        app.use(Express.methodOverride());
+                        app.use(Express.json());
+                        app.use(Express.urlencoded());
+                    }
+
+
+
+
+
+                    //app.use(Express.json());
+
                     app.use(allowCrossDomain);
                     app.use(function(req, res, next) {
                         var reqDomain = domain.create();
@@ -179,7 +226,14 @@ _.extend(WebServiceManager.prototype, Base.prototype, {
                 });
 
                 app.configure('production', function() {
-                    app.use(Express.logger());
+
+                        if ( Baram.getInstance().get('express') > 3) {
+                            var morgan  = require('morgan');
+                            app.use(morgan());
+                        } else {
+                            app.use(Express.logger());
+                        }
+
                     app.use(myErrorHandler);
                     app.use(Express.static(process.cwd() + '/public', { maxAge: 31557600000 }));
                 });
@@ -188,7 +242,14 @@ _.extend(WebServiceManager.prototype, Base.prototype, {
                 app.configure('development', function () {
                     app.use(Express.static(process.cwd() + '/public'));
                    // app.use(Express.static(process.cwd() + '/public', { maxAge: 31557600000 }));
-                    app.use(Express.errorHandler({ dumpExceptions: true, showStack: true }));
+                        if ( Baram.getInstance().get('express') > 3) {
+                            var errorhandler = require('errorhandler');
+                            app.use(errorhandler());
+                        } else {
+                            app.use(Express.errorHandler({ dumpExceptions: true, showStack: true }));
+                        }
+
+
                 });
 
           },
