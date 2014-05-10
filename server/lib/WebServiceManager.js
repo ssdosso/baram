@@ -108,16 +108,14 @@ _.extend(WebServiceManager.prototype, Base.prototype, {
                   serverDomain.run(function(){
                       if (typeof app.configure !== 'function') {
                          Baram.getInstance().set('express',4);
-
-                          app.configure = function(callback) {
-                            if (typeof callback === 'string') {
-                                callback = arguments[1];
-                                callback();
-                                console.log();
-                            } else {
-                                callback();
-                            }
-
+                          app.configure = function(env) {
+                              var args = [].slice.call(arguments),callback,envs = 'all';
+                              callback = args.pop();
+                              if (args.length) envs = args;
+                              if ('all' == envs || ~envs.indexOf(app.get('env'))) {
+                                   callback.call(this);
+                              }
+                              return this;
                           }
                       } else {
                           Baram.getInstance().set('express',3);
@@ -175,7 +173,7 @@ _.extend(WebServiceManager.prototype, Base.prototype, {
                         app.use(bodyParser()); // pull information from html in POST
                         app.use(bodyParser.json());
                         app.use(bodyParser.urlencoded());
-                        //테스트 필요...
+                        //todo 테스트 필요...
                         app.use(session({
                             keys: ['key1', 'key2'],
                             secureProxy: true // if you do SSL outside of node
@@ -183,7 +181,8 @@ _.extend(WebServiceManager.prototype, Base.prototype, {
                         app.use(function (req, res, next) {
                             var n = req.session.views || 0
                             req.session.views = ++n
-                            res.end(n + ' views')
+                            next();
+                            //res.end(n + ' views')
                         })
                         var compress = require('compression');
                         app.use(compress());
@@ -202,7 +201,6 @@ _.extend(WebServiceManager.prototype, Base.prototype, {
 
 
 
-                    //app.use(Express.json());
 
                     app.use(allowCrossDomain);
                     app.use(function(req, res, next) {
@@ -240,8 +238,8 @@ _.extend(WebServiceManager.prototype, Base.prototype, {
 
 
                 app.configure('development', function () {
+
                     app.use(Express.static(process.cwd() + '/public'));
-                   // app.use(Express.static(process.cwd() + '/public', { maxAge: 31557600000 }));
                         if ( Baram.getInstance().get('express') > 3) {
                             var errorhandler = require('errorhandler');
                             app.use(errorhandler());
