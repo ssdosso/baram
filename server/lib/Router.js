@@ -14,6 +14,10 @@ function Router (mgr, name) {
     this.base();
 };
 
+Router.prototype.__defineGetter__('teee', function () {
+
+});
+
 
 _.extend(Router.prototype, Base.prototype, {
            init : function(app) {
@@ -48,11 +52,16 @@ _.extend(Router.prototype, Base.prototype, {
            },
            get : function(path,callback) {
                 var self = this;
-
                this.app.get(path,function(){
                    callback.apply(self,arguments);
                });
            },
+           post : function(path,callback) {
+                var self = this;
+                this.app.post(path,function(){
+                    callback.apply(self,arguments);
+                });
+            },
             render : function(res,req,variables) {
                 var layout = variables.layout;
                 delete variables.layout;

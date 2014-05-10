@@ -14,11 +14,12 @@
     "single": true,
     "useDB" : true,
     "db" : {
-        "dbdriver":"Mysql",
+        "driver":"Mysql",
         "hostname":"localhost",
         "username" :"root",
         "database" :"sdsd",
-        "password":"sdsd"
+        "password":"sdsd",
+        "pooling": false
 
 
     }

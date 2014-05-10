@@ -136,7 +136,7 @@ Baram.Server.prototype.__defineGetter__('log', function () {
   Baram.triggerMethod = require('./triggerMethod');
   Baram.Transport = require('./Transport');
   Baram.ApplicationFactory = require('./ApplicationFactory');
-  Baram.Db = require('./Db');
+  Baram.Db = require('./database/Db');
 
 
 

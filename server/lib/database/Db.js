@@ -1,7 +1,7 @@
 var EventEmitter = process.EventEmitter
     ,_ = require('underscore')
     , fs = require('fs')
-    , Baram = require('./Baram')
+    , Baram = require('./../Baram')
 
     , async = require('async')
     , assert= require('assert');
@@ -9,7 +9,7 @@ var EventEmitter = process.EventEmitter
 exports = module.exports = DB;
 
 function DB (mgr, name) {
-    this.trigger = require('./triggerMethod');
+    this.trigger = require('./../triggerMethod');
 
     this.config = Baram.getInstance().get('db');
 };
@@ -17,12 +17,13 @@ function DB (mgr, name) {
 
 _.extend(DB.prototype, EventEmitter.prototype, {
     db: null,
+
     create : function() {
-        if(!this.config.dbdriver) {
-            Mono.getInstance().log.info('db driver not find ')
+        if(!this.config.driver) {
+            Baram.getInstance().log.info('db driver not find ')
         }
 
-        this.driverName = this.config.dbdriver;
+        this.driverName = this.config.driver;
         var Database = require('./drivers/'+this.driverName);
         this.db = new Database();
         this.db.create(this.config);
