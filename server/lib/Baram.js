@@ -11,17 +11,6 @@
 
  var Baram = {};
 
-function Class() { }
-Class.prototype.construct = function() {};
-Class.__asMethod__ = function(func, superClass) {
-    return function() {
-        var currentSuperClass = this.$;
-        this.$ = superClass;
-        var ret = func.apply(this, arguments);
-        this.$ = currentSuperClass;
-        return ret;
-    };
-};
 
  /**
   * singleton Object
@@ -88,15 +77,10 @@ Baram.Server.prototype.__defineGetter__('log', function () {
             if (this.get('appDir')) {
                 this.ApplicationFactory = new Baram.ApplicationFactory;
                 this.ApplicationFactory.create();
-                //var app = require(process.cwd()+'/'+this.get('appDir'));
             }
 
-
-
         },
-        extend: function(d) {
-            console.log(d)
-        },
+
         getWebServer: function() {
             return this._webServices[this._webIndex];
         },
@@ -118,13 +102,20 @@ Baram.Server.prototype.__defineGetter__('log', function () {
             return this;
         },
 
-
+         /**
+          * web port listen
+          * @param service
+          */
         listenService : function(service) {
 
+             if (this.get('useDB')) {
+                 this.db = new  Baram.Db();
+                 this.db.create();
+             }
 
-//            if (!info.namespace) assert(0,'환경 변수 값에 namespace 값이 존재 해야 함..');
 
-            this._webServices[this._webIndex] =  new Baram.WebServiceManager();
+
+             this._webServices[this._webIndex] =  new Baram.WebServiceManager();
             this._webServices[this._webIndex] .create(service);
             if (Cluster.isWorker || this.get('single')) {
                 this._webServices[this._webIndex].listen(function(server){
@@ -134,6 +125,18 @@ Baram.Server.prototype.__defineGetter__('log', function () {
         }
 
     });
+
+
+
+  Baram.Logger =  require('./Logger');
+
+  Baram.Storage = require('./Storage');
+  Baram.WebServiceManager =  require('./WebServiceManager');
+  Baram.config =  require('./configure');
+  Baram.triggerMethod = require('./triggerMethod');
+  Baram.Transport = require('./Transport');
+  Baram.ApplicationFactory = require('./ApplicationFactory');
+  Baram.Db = require('./Db');
 
 
 
@@ -171,14 +174,4 @@ var extend = function(protoProps, staticProps) {
     return child;
 };
 
-  exports.extend = extend;
-
-
-  Baram.Logger =  require('./Logger');
-
-  Baram.Storage = require('./Storage');
-  Baram.WebServiceManager =  require('./WebServiceManager');
-  Baram.config =  require('./configure');
-  Baram.triggerMethod = require('./triggerMethod');
-  Baram.Transport = require('./Transport');
-  Baram.ApplicationFactory = require('./ApplicationFactory');
+exports.extend = extend;

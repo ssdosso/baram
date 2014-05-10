@@ -11,5 +11,15 @@
      ,
     "logDir" :"./logs",
     "application": false,
-    "single": true
+    "single": true,
+    "useDB" : true,
+    "db" : {
+        "dbdriver":"Mysql",
+        "hostname":"localhost",
+        "username" :"root",
+        "database" :"sdsd",
+        "password":"sdsd"
+
+
+    }
 }
