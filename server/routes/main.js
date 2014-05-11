@@ -25,7 +25,8 @@ _.extend(MainRouter.prototype, Router.prototype, {
 
     start : function() {
 
-        this.get('/', function(req,res){
+        this.get('/test', function(req,res){
+
            this.end({layout:'index'});
         });
     }

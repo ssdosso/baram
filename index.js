@@ -19,7 +19,7 @@ var baram = Baram.getInstance();
 baram.create({
     config: [
         {short:"p",long:"port",description:"port", value:true},
-        {short:"c",     long:"cache",           description:"cache 사용여부", value:true, parser:function (value) {
+        {short:"d",     long:"useDB",           description:"데이터베이스 사용여부", value:true, parser:function (value) {
             if (value == 'true') {
                 return true;
             } else {

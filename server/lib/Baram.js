@@ -7,6 +7,7 @@
      , EventEmitter = process.EventEmitter
      ,  Cluster = require('cluster')
      , Base = require('./Base')
+    , assert = require('assert')
      , async = require('async');
 
  var Baram = {};
@@ -79,6 +80,10 @@ Baram.Server.prototype.__defineGetter__('log', function () {
                 this.ApplicationFactory.create();
             }
 
+        },
+        getController: function(controllerName) {
+            assert(controllerName)
+            return  this.ApplicationFactory.getController(controllerName);
         },
 
         getWebServer: function() {

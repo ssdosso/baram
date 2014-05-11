@@ -32,6 +32,22 @@ var MainController =  {
                     });
                 }
             );
+            this.settings = new Backbone.Model();
             webServer.addRouters('application/routers');
+            /**
+             * 클라이언트에서 사용하게될 기본 스크립트
+             */
+            this.set('init_js',{
+                "dev-js": { "data-main": "/js/app/config/config.js", "src": "/js/libs/require.js" },
+                "init": "/js/app/DesktopInit.js"
+            });
+
+
+        },
+        get : function(name) {
+            return this.settings.get(name);
+        },
+        set : function(name,val) {
+            this.settings.set(name,val)
         }
 })

@@ -12,11 +12,9 @@ exports= module.exports = Router;
 function Router (mgr, name) {
 
     this.base();
-};
+}
 
-Router.prototype.__defineGetter__('teee', function () {
 
-});
 
 
 _.extend(Router.prototype, Base.prototype, {
@@ -25,9 +23,11 @@ _.extend(Router.prototype, Base.prototype, {
 
               this.start();
            },
-            test : function() {
-                console.log(333);
-            },
+           getController: function(controllerName) {
+                assert(controllerName);
+               return Baram.getInstance().getController(controllerName)
+           },
+
             end : function(variables) {
 
                var args = Array.prototype.slice.apply(arguments.callee.caller.arguments);
@@ -46,6 +46,7 @@ _.extend(Router.prototype, Base.prototype, {
                });
                if (variables.layout)
                {
+                   console.log(variables)
                    this.render(res,req,variables);
                }
 

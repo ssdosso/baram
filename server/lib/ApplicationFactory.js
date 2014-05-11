@@ -20,6 +20,14 @@ _.extend(Application.prototype, EventEmitter.prototype, {
         this.appDir = Baram.getInstance().get('appDir');
         this.addControllers();
     },
+    /**
+     * 외부에서 applicaction 컨트롤러를 리턴
+     * @param className
+     * @returns {*}
+     */
+    getController : function(className) {
+        return this._controllers[className];
+    },
     addController: function(controller) {
 
         this._controllers[controller.className] = controller.getInstance();
