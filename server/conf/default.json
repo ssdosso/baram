@@ -17,9 +17,9 @@
         "driver":"Mysql",
         "hostname":"localhost",
         "username" :"root",
-        "database" :"sdsd",
-        "password":"sdsd",
-        "pooling": false
+        "database" :"world",
+        "password":"1234",
+        "pool": false
 
 
     }
