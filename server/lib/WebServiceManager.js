@@ -38,6 +38,12 @@ _.extend(WebServiceManager.prototype, Base.prototype, {
           _workers :null,
           _worker:null,
           _master:null,
+          getHttpServer: function() {
+              return this._server;
+          },
+          setHttpServer: function(server) {
+            this._server = server;
+          },
           create : function(options) {
               var scope = this
                   , server
@@ -88,10 +94,10 @@ _.extend(WebServiceManager.prototype, Base.prototype, {
                   var app =  this.app = Express();
 
                   if (secureOptions) {
-                      this._server = Https.createServer(secureOptions, this.app);
+                      this.setHttpServer( Https.createServer(secureOptions, this.app));
                       Baram.getInstance().info('SSL Server create');
                   } else {
-                      this._server = Http.createServer(this.app);
+                      this.setHttpServer(Http.createServer(this.app));
 
                       Baram.getInstance().log.info('http Server create');
                   }
@@ -253,16 +259,16 @@ _.extend(WebServiceManager.prototype, Base.prototype, {
           },
           listen : function(callback) {
               var self = this;
-              this._server.listen(this.options.port, function () {
+              this.getHttpServer().listen(this.options.port, function () {
                   console.info("Baram server listening on port " + self.options.port);
                   Baram.getInstance().trigger("initialize:after", {});
-                 if(!Baram.getInstance().get('single')) self._worker.onActive();
+                  if(!Baram.getInstance().get('single')) self._worker.onActive();
                   if (self.options.transport) {
-                      callback.call(Baram.getInstance(),self._server);
+                      callback.call(Baram.getInstance(), self.getHttpServer());
                   }
 
               });
-              this._server.on('clientError',function(exception) {
+              this.getHttpServer().on('clientError',function(exception) {
 
                   Baram.getInstance().log.error({exception:exception});
                   console.log('## ' + exception);

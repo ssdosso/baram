@@ -2,7 +2,7 @@
 
      "service" :  {
          "default":true,
-         "port" : 80,
+         "port" : 8080,
          "namespace" : "default",
          "transport" : true,
          "transportOptions": {},
@@ -12,7 +12,7 @@
     "logDir" :"./logs",
     "application": false,
     "single": true,
-    "useDB" : true,
+    "useDB" : false,
     "db" : {
         "driver":"Mysql",
         "hostname":"localhost",

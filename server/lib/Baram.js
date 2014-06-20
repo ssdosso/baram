@@ -52,6 +52,12 @@ var BaramService  = {
 
             scope.listenService(service);
         });
+
+        this.on('initialize:transport',function(socketServer){
+
+            scope.trigger('startSocket',socketServer);
+
+        });
     };
 
 Baram.Server.prototype.__defineGetter__('log', function () {
@@ -117,6 +123,7 @@ Baram.Server.prototype.__defineGetter__('log', function () {
                  this.db = new  Baram.Db();
                  this.db.create();
              }
+
 
 
 

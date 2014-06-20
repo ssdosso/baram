@@ -24,42 +24,37 @@ _.extend(Transport.prototype, Base.prototype, {
         var options = function() {
             return server.options;
         }
-        this.server =  io.listen(server);
-        this.server.enable('browser client minification');  // send minified client
-        this.server.enable('browser client etag');          // apply etag caching logic based on version number
-        this.server.enable('browser client gzip');          // gzi
-        this.server.configure(function () {
-            self.server.enable('browser client etag');
+        //0.9.16
 
+        this._socketServer =  io.listen(server);
 
-            if (!Baram.getInstance().get('single')) {
-                Baram.getInstance().log.info('Redis connect to: '+options().redis.host+':'+options().redis.port);
-                var RedisStore = io.RedisStore,opts = { host: options().redis.host, port: options().redis.port };
-                self.server.set('store', new RedisStore( { redisPub: opts, redisSub: opts, redisClient: opts } ));
-            }
+        if (!Baram.getInstance().get('single')) {
+            Baram.getInstance().log.info('Redis connect to: '+options().redis.host+':'+options().redis.port);
+            var RedisStore = io.RedisStore,opts = { host: options().redis.host, port: options().redis.port };
+            self._socketServer.set('store', new RedisStore( { redisPub: opts, redisSub: opts, redisClient: opts } ));
+        }
 
-
-            if (server.options.transportOptions != null ) {
+        if (server.options.transportOptions != null ) {
                 for (var opt in server.options.transportOptions) {
-                    self.server.set(opt, server.options.transportOptions[opt]);
+                    self._socketServer.set(opt, server.options.transportOptions[opt]);
                 }
-            }
+         }
+        this.connectionEvent();
+//        this.server.enable('browser client minification');  // send minified client
+//        this.server.enable('browser client etag');          // apply etag caching logic based on version number
+//        this.server.enable('browser client gzip');          // gzi
+//        this.server.configure(function () {
+//            self.server.enable('browser client etag');
 //
-//            var transportsOpt = null;
 //
-//            if (options.transport && options.transport.length > 0) {
-//                transportsOpt = options.transport;
-//            } else {
-//                transportsOpt = ['websocket', 'xhr-polling', 'htmlfile', 'jsonp-polling'];
-//
-//            }
-//
-//            console.log('Transports:', transportsOpt);
-//
-           // socketServer.set('transports', transportsOpt);
-           self.connectionEvent();
 
-        });
+//
+//
+
+//
+//           self.connectionEvent();
+//
+//        });
     },
     connectionEvent : function() {
         var serverDomain = domain.create();
@@ -70,11 +65,9 @@ _.extend(Transport.prototype, Base.prototype, {
             }
         });
         serverDomain.run(function(){
-            self.server.sockets.on('connection', function (socket) {
 
-            });
         });
 
-        Baram.getInstance().trigger("initialize:transport", self.server);
+        Baram.getInstance().trigger("initialize:transport", self._socketServer);
     }
 });

@@ -32,6 +32,7 @@ var MainController =  {
                     });
                 }
             );
+
             this.settings = new Backbone.Model();
             webServer.addRouters('application/routers');
             /**
@@ -42,7 +43,14 @@ var MainController =  {
                 "init": "/js/app/DesktopInit.js"
             });
 
-
+            /*
+                socket 이벤트
+             */
+            Baram.getInstance().on('startSocket',function(socketServer){
+                socketServer.sockets.on('connection', function (socket) {
+                   // console.log(socket)
+                });
+            });
         },
         get : function(name) {
             return this.settings.get(name);

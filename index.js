@@ -53,8 +53,5 @@ baram.on("initialize:after", function(options){
 });
 
 
-baram.on('initialize:transport',function(server){
-
-});
 
 
