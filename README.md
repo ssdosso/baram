@@ -1,7 +1,7 @@
-Web Application Framework for Node.js
+# Web Application Framework for Node.js
 
 
-# express, socket.io redis Backbone.js 를 활용한 웹프레임워크 입니다.
+ express, socket.io redis Backbone.js 를 활용한 웹프레임워크 입니다.
 간단하게웹서버 포트를 열고,경우에 따라서 클러스터로 기동하고, 
 또 Redis 를 통한 세션 공유, 서버와 application 의 분리가 주 목적입니다.
 
