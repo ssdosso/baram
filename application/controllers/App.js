@@ -1,25 +1,19 @@
 
-var App = {}
-    ,Baram = require('../../server/lib/Baram')
+var
+    Baram = require('../../server/lib/Baram')
     , Express = require('express')
+    , gcm = require('node-gcm')
     ,Application = require('../../server/lib/Application');
 
 var Backbone = require('backbone')
     , _ = require('underscore');
 
-var MainController =  {
-    className: 'main',
-    getInstance : function() {
-        if (this._instance === undefined) {
-            this._instance = new App.Controller();
-        }
-        return this._instance;
-    }
-}
- module.exports = MainController;
+
+//var MainController = Baram.getInstance().createAppInstance('main');
 
 
- App.Controller = Application.extend({
+
+var App = Application.extend({
         create : function() {
 
             var webServer = Baram.getInstance().getWebServer();
@@ -57,5 +51,10 @@ var MainController =  {
         },
         set : function(name,val) {
             this.settings.set(name,val)
+        },
+        test : function() {
+            console.log('call Main method');
         }
-})
+});
+
+module.exports = Baram.getInstance().createAppInstance('main',App);

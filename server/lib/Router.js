@@ -28,7 +28,7 @@ _.extend(Router.prototype, Base.prototype, {
                return Baram.getInstance().getController(controllerName)
            },
 
-            end : function(variables) {
+            end : function(variables,mode) {
 
                var args = Array.prototype.slice.apply(arguments.callee.caller.arguments);
                if (args.length < 1) {
@@ -37,6 +37,11 @@ _.extend(Router.prototype, Base.prototype, {
                var req = args[0];
                var res = args[1];
 
+
+               if (_.isNumber(variables)) {
+                   res.send(variables);
+                    return;
+               }
                if (!_.isObject(variables)) variables = {};
                 //TODO session info
                 var userData = {};
@@ -46,8 +51,7 @@ _.extend(Router.prototype, Base.prototype, {
                });
                if (variables.layout)
                {
-                   console.log(variables)
-                   this.render(res,req,variables);
+                    this.render(res,req,variables);
                }
 
            },

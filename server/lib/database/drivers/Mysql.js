@@ -16,6 +16,7 @@ var EventEmitter = process.EventEmitter
         var self = this;
 
         return  (function() {
+
             if (this.get('pool') === true) {
                 self.conn = Mysql.createPool({
                     host     : this.get('hostname'),

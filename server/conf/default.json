@@ -14,10 +14,10 @@
     "single": true,
     "useDB" : false,
     "db" : {
-        "driver":"Mysql",
-        "hostname":"localhost",
+        "driver":"Mongodb",
+        "hostname":"localhost:27017",
         "username" :"root",
-        "database" :"world",
+        "database" :"mydb",
         "password":"1234",
         "pool": false
 

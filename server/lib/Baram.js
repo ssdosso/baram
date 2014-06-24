@@ -87,6 +87,22 @@ Baram.Server.prototype.__defineGetter__('log', function () {
             }
 
         },
+        createAppInstance: function(className,APP) {
+
+            return {
+                className : className,
+                getInstance : function() {
+                    if (this._instance === undefined) {
+                        this._instance = new APP();
+                    }
+                    return this._instance;
+                },
+                get : function() {
+                    assert(this._instance);
+                    return this._instance;
+                }
+            }
+        },
         getController: function(controllerName) {
             assert(controllerName)
             return  this.ApplicationFactory.getController(controllerName);

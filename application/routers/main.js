@@ -15,10 +15,21 @@ var ViewRouter = Router.extend(
             var controller = Baram.getInstance().getController('main');
 
             this.get('/', function(req,res){
-
-                console.log(controller.get('init_js'));
                 this.end({layout:'index',init_js:controller.get('init_js')});
             });
+
+            this.get('/regist',function(req,res){
+
+                this.getController('main').test();
+                this.end(200);
+            });
+            this.get('/gcm-demo',function(req,res){
+
+
+                this.end(200);
+
+            });
+
         }
     })
 
