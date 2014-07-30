@@ -25,4 +25,4 @@ express 3.X , express 4.x 를 지원하며
 node app.js
 node app.js -p 8080  -s false // 클러스터로 기동
 
-![ScreenShot](http://lh6.googleusercontent.com/-qTrWfObXxe4/U9W8oOQq36I/AAAAAAAAAFQ/yBP31n3WnX8/w720-h556-no/Cluster+Chart+-+New+Page.jpeg)
+![ScreenShot](https://lh4.googleusercontent.com/-iG9gNAXPOjY/U9ibCDiLFBI/AAAAAAAAAGI/4PCGlJ-kZ2Y/w1064-h822-no/Cluster+Chart+-+New+Page.png)
