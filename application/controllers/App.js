@@ -39,7 +39,7 @@ var App = Application.extend({
         main: function(callback) {
 
 
-            callback();
+            this.routerCallback = callback;
         }
 
 

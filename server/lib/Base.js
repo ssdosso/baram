@@ -3,6 +3,7 @@ var EventEmitter = process.EventEmitter
     , fs = require('fs')
     , Baram = require('./Baram')
     , async = require('async')
+    , Event = require('./Event')
     , assert= require('assert');
 
 exports = module.exports = Base;

@@ -11,7 +11,7 @@
      ,
     "logDir" :"./logs",
     "application": false,
-    "single": false,
+    "single": true,
     "useDB" : false,
     "db" : {
         "driver":"Mongodb",

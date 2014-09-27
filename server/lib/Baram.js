@@ -8,6 +8,7 @@
      ,  Cluster = require('cluster')
      , Base = require('./Base')
     , assert = require('assert')
+
      , async = require('async');
 
  var Baram = {};
@@ -44,7 +45,9 @@ var BaramService  = {
         this._webServices = {};
         this._webIndex = 0;
 
+
         var scope = this;
+
         this.on('ready',function(){
             scope.logger.init();
 

@@ -40,21 +40,6 @@ _.extend(Transport.prototype, Base.prototype, {
                 }
          }
         this.connectionEvent();
-//        this.server.enable('browser client minification');  // send minified client
-//        this.server.enable('browser client etag');          // apply etag caching logic based on version number
-//        this.server.enable('browser client gzip');          // gzi
-//        this.server.configure(function () {
-//            self.server.enable('browser client etag');
-//
-//
-
-//
-//
-
-//
-//           self.connectionEvent();
-//
-//        });
     },
     connectionEvent : function() {
         var serverDomain = domain.create();
