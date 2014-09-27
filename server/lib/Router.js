@@ -28,19 +28,11 @@ _.extend(Router.prototype, Base.prototype, {
                return Baram.getInstance().getController(controllerName)
            },
 
-            end : function(variables,mode) {
-
-               var args = Array.prototype.slice.apply(arguments.callee.caller.arguments);
-               if (args.length < 1) {
-                   assert(0);
-               }
-               var req = args[0];
-               var res = args[1];
-
+            end : function(req,res,variables,mode) {
 
                if (_.isNumber(variables)) {
                    res.send(variables);
-                    return;
+                   return;
                }
                if (!_.isObject(variables)) variables = {};
                 //TODO session info

@@ -100,27 +100,27 @@ _.extend(S3storage.prototype, EventEmitter.prototype, {
       addBucket: function(targetBucket) {
             return new BlueBucket({Bucket:targetBucket});
       },
-//      put : function(file,next){
-//          var s3bucket = new AWS.S3({Bucket:'Baram-test-00'});
-//          var self = this;
-//
-//         fs.readFile(file.path, function (err, data) {
-//              if (err) throw err;
-//              var params = {Bucket:'Baram-test-00',Body: data,Key:file.name};
-//              s3bucket.putObject(params, function() {
-//                  next();
-//              })
-//          });
-//      } ,
-//      get : function() {
-//          s3bucket.getObject({Bucket:'Baram-test-00',Key:file.name}).
-//                      on('httpData', function(chunk) {
-//                          wfile.write(chunk);
-//                      }).
-//                      on('httpDone', function() {
-//                          wfile.end();
-//                      }).
-//                      send();
-//
-//      }
+      put : function(file,next){
+          var s3bucket = new AWS.S3({Bucket:'Baram-test-00'});
+          var self = this;
+
+         fs.readFile(file.path, function (err, data) {
+              if (err) throw err;
+              var params = {Bucket:'Baram-test-00',Body: data,Key:file.name};
+              s3bucket.putObject(params, function() {
+                  next();
+              })
+          });
+      } ,
+      get : function() {
+          s3bucket.getObject({Bucket:'Baram-test-00',Key:file.name}).
+                      on('httpData', function(chunk) {
+                          wfile.write(chunk);
+                      }).
+                      on('httpDone', function() {
+                          wfile.end();
+                      }).
+                      send();
+
+      }
 });

@@ -32,6 +32,7 @@ _.extend(Logger.prototype, Base.prototype, {
             var month = dt.getMonth()+1;
             var day = dt.getDate();
             var year = dt.getFullYear();
+            var self = this;
             this.currentMonthdir = year.toString()+month.toString();
             this.dir =Baram.getInstance().get('logDir');
             if (!fs.existsSync(this.dir)) {
@@ -51,7 +52,8 @@ _.extend(Logger.prototype, Base.prototype, {
                 ]
             });
 
-            setInterval(this._createLogFile,84600 * 1000);
+
+            setInterval(function(){ self._createLogFile() },84600 * 1000);
         },
         info : function() {
              this.logger.info.apply(this.files, arguments);

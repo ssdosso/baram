@@ -15,6 +15,13 @@ function Application() {
     Base.prototype.constructor.apply(this,['start']);
  }
 _.extend(Application.prototype, Base.prototype, {
+    callback : function() {},
+    get : function(name) {
+        return this.settings.get(name);
+    },
+    set : function(name,val) {
+        this.settings.set(name,val)
+    }
 
 });
 
