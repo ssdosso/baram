@@ -24,6 +24,9 @@ _.extend(MasterServer.prototype,EventEmitter.prototype,{
             self.onMessage(data,id);
         });
     },
+    isMaster : function() {
+        return true;
+    },
     create : function() {
         var self = this;
         this._workers = {};
@@ -55,11 +58,20 @@ _.extend(MasterServer.prototype,EventEmitter.prototype,{
     }  ,
     onMessage: function(packet,id) {
         packet.id = id;
-        var name = (packet.ev && !packet.pid )? packet.ev : 'message';
-        var params = [name].concat(packet.args,packet.id),self=this;
-        process.nextTick(function(){
-            self.emit.apply(self,params);
-        });
+        var name = (packet.pid)? packet.pid : 'message';
+        var params = [name].concat(packet.args),self=this;
+
+        var controllers = Baram.getInstance().getControllers();
+
+
+        for (var i in controllers) {
+            console.log(i)
+            console.log(controllers[i])
+            process.nextTick(function(){
+                controllers[i].emit.apply( controllers[i],params);
+            });
+        }
+
 
     },
     send: function(data){

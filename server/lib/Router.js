@@ -18,10 +18,13 @@ function Router (mgr, name) {
 
 
 _.extend(Router.prototype, Base.prototype, {
-           init : function(app) {
+           init : function(app,webManager) {
                 this.app = app;
-
-              this.start();
+                this.webManager = webManager;
+                this.start();
+           },
+           getWorker : function() {
+               return this.webManager.getWorker();
            },
            getController: function(controllerName) {
                 assert(controllerName);

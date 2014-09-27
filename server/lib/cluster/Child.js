@@ -21,12 +21,16 @@ function ChildServer () {
 _.extend(ChildServer.prototype,EventEmitter.prototype,{
     create : function() {
         var self = this;
+
         process.on('message', function(data) {
             self.onMessage(data);
         });
-    } ,
+    },
+    isMaster : function() {
+      return false;
+    },
     onActive: function() {
-        this.sendToMaster({ev:'onWorks'});
+       // this.sendToMaster({ev:'onWorks'});
     },
     sendToMaster: function(data){
         var packet = {
@@ -37,13 +41,14 @@ _.extend(ChildServer.prototype,EventEmitter.prototype,{
             process.send(packet);
         });
     },
-    send: function(data){
+    send: function(ev){
+        var args = Array.prototype.slice.apply(arguments);
         var packet = {
             ev :'message',
-            type:'sendMessage',
-            pid :'message',
-            args: data
+            pid :ev
         }
+        args = args.slice(1, args.length);
+        packet.args = args;
         process.nextTick(function(){
             process.send(packet);
         });

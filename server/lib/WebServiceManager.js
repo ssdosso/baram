@@ -25,11 +25,15 @@ exports =  module.exports  = WebServiceManager;
 function WebServiceManager() {
     "use strict";
     Base.prototype.constructor.apply(this,arguments);
-    if (Cluster.isWorker) {
-        this._worker = new ChildServer;
-    } else {
-        this._master = new  MasterServer();
+    var single = Baram.getInstance().get('single');
+    if (!single) {
+        if (Cluster.isWorker) {
+            this._worker = new ChildServer;
+        } else {
+            this._master = new  MasterServer();
+        }
     }
+
 
 }
 
@@ -61,6 +65,7 @@ _.extend(WebServiceManager.prototype, Base.prototype, {
                   if ( Cluster.isWorker ) {
                       this._worker = new ChildServer;
                   } else {
+
                       this._master = new  MasterServer();
                   }
               }
@@ -74,11 +79,14 @@ _.extend(WebServiceManager.prototype, Base.prototype, {
                       this._workers[i] = Cluster.fork();
                   }
                   this._master.create();
+
+
                   this._master.on('message', function (data, id) {
 
                          console.log('child on message');
                          console.log(data)
                   });
+
               }  else  {
                   if(!single) this._worker.create();
 
@@ -127,7 +135,7 @@ _.extend(WebServiceManager.prototype, Base.prototype, {
                           Baram.getInstance().set('express',3);
                       }
 
-                      scope.setConfigure(server,options);
+                      scope.webInitialize(server,options);
                   });
 
 
@@ -142,7 +150,10 @@ _.extend(WebServiceManager.prototype, Base.prototype, {
           addConfigure: function(callback) {
               callback(this.app);
           },
-          setConfigure: function(server,options) {
+          getWorker : function() {
+              return this._worker;
+          },
+          webInitialize: function(server,options) {
                 var app = this.app,scope=this;
 
                 var allowCrossDomain =function(req, res, next) {
@@ -224,8 +235,9 @@ _.extend(WebServiceManager.prototype, Base.prototype, {
 
                         next();
                     });
-                    scope.routerFactory = new RouterFactory(app);
+                    scope.routerFactory = new RouterFactory(app,scope);
                     scope.routerFactory.addRouters('routes');
+
 
                 });
 

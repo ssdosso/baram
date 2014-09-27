@@ -15,10 +15,14 @@ function Application() {
 
 
 _.extend(Application.prototype, EventEmitter.prototype, {
-    create : function() {
+    create : function(type) {
+        this.type = type ? type : 'all';
         this._controllers = {};
         this.appDir = Baram.getInstance().get('appDir');
         this.addControllers();
+    },
+    getControllers : function() {
+        return this._controllers;
     },
     /**
      * 외부에서 applicaction 컨트롤러를 리턴
@@ -29,9 +33,21 @@ _.extend(Application.prototype, EventEmitter.prototype, {
         return this._controllers[className];
     },
     addController: function(controller) {
+        if (this.type === 'all') {
+            this._controllers[controller.className] = controller.getInstance();
+            this._controllers[controller.className].create();
+        } else {
+            switch (this.type) {
+                case 'cluster':
+                    if (controller.getInstance().type === 'cluster') {
+                        this._controllers[controller.className] = controller.getInstance();
+                        this._controllers[controller.className].create();
+                    }
+                    break;
 
-        this._controllers[controller.className] = controller.getInstance();
-        this._controllers[controller.className].create();
+            }
+        }
+
     },
     addControllers: function() {
         var self = this;

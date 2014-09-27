@@ -11,7 +11,7 @@ var Backbone = require('backbone')
 
 
 var App = Application.extend({
-
+        type :'web',
         create : function() {
             var webServer = Baram.getInstance().getWebServer();
             webServer.addConfigure(
@@ -38,8 +38,8 @@ var App = Application.extend({
         },
         main: function(callback) {
 
+            callback();
 
-            this.routerCallback = callback;
         }
 
 

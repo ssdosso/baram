@@ -16,6 +16,9 @@ var ViewRouter = Router.extend(
 
             this.get('/', function(req,res){
                 var self = this;
+
+               var worker = self.getWorker();
+                worker.send('workerEventTest','sendToWorkerMessage',1,2,3);
                 controller.main(function(){
                     self.end(req,res,{layout:'index',init_js:controller.get('init_js')});
                 });

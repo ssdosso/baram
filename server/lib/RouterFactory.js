@@ -8,16 +8,17 @@ var EventEmitter = process.EventEmitter
 
 exports = module.exports = RouterFactory;
 
-function RouterFactory (app) {
+function RouterFactory (app,webManager) {
 
     this.app = app;
+    this.webManager = webManager;
     this._routers = {};
 };
 
 _.extend(RouterFactory.prototype, Base.prototype, {
     addRouter:function (name, router) {
         this._routers[name] = new router();
-        this._routers[name].init(this.app);
+        this._routers[name].init(this.app,this.webManager);
     },
     addRouters : function(path) {
 
@@ -27,21 +28,16 @@ _.extend(RouterFactory.prototype, Base.prototype, {
             path = 'server/'+path;
         }
 
-       // console.log(process.cwd());
-//        require(process.cwd()+'/'+path + '/about');
         fs.readdirSync(path).forEach(function (file) {
-
             var stats = fs.statSync(process.cwd()+'/'+path + '/' + file);
             if (stats.isFile()) {
                 var routerClasses = require(process.cwd()+'/'+path + '/' + file);
-
                 var isClassName = false;
                 for (var className in routerClasses) {
                     isClassName = true;
                     self.addRouter(className, routerClasses[className]);
                 }
                 if (!isClassName) {
-
                    console.error(file + ' module.exports does not exist.');
                 }
             }

@@ -48,6 +48,11 @@ var BaramService  = {
 
         var scope = this;
 
+        this.on('masterOnload',function(){
+            scope.set('application',true);
+            scope.set('appDir','application');
+             scope.start('cluster');
+        });
         this.on('ready',function(){
             scope.logger.init();
 
@@ -81,12 +86,14 @@ Baram.Server.prototype.__defineGetter__('log', function () {
 
             this.settings.start(options.config,this);
         } ,
-
-        start: function() {
+         /**
+          * port 가 listen  하면..
+          */
+        start: function(type) {
 
             if (this.get('appDir')) {
-                this.ApplicationFactory = new Baram.ApplicationFactory;
-                this.ApplicationFactory.create();
+                this.applicationFactory = new Baram.ApplicationFactory;
+                this.applicationFactory.create(type);
             }
 
         },
@@ -106,11 +113,14 @@ Baram.Server.prototype.__defineGetter__('log', function () {
                 }
             }
         },
+        getControllers: function() {
+
+           return  this.applicationFactory.getControllers();
+        },
         getController: function(controllerName) {
             assert(controllerName)
-            return  this.ApplicationFactory.getController(controllerName);
+            return  this.applicationFactory.getController(controllerName);
         },
-
         getWebServer: function() {
             return this._webServices[this._webIndex];
         },
@@ -122,36 +132,30 @@ Baram.Server.prototype.__defineGetter__('log', function () {
             return this.settings.set(name,value);
         },
         configure : function(env,fn) {
-
             var envs,args= [].slice.call(arguments);
             fn = args.pop();
             if (args.length) envs = args;
             fn.call(this);
-
-
             return this;
         },
-
          /**
           * web port listen
           * @param service
           */
         listenService : function(service) {
-
              if (this.get('useDB')) {
                  this.db = new  Baram.Db();
                  this.db.create();
              }
-
-
-
-
-             this._webServices[this._webIndex] =  new Baram.WebServiceManager();
+            this._webServices[this._webIndex] =  new Baram.WebServiceManager();
             this._webServices[this._webIndex] .create(service);
             if (Cluster.isWorker || this.get('single')) {
                 this._webServices[this._webIndex].listen(function(server){
                     this.transport.create(server);
                 });
+            } else {
+
+                this.trigger("masterOnload", {isMaster:true});
             }
         }
 
