@@ -2,32 +2,34 @@
  * Singleton Class
  * @type {*}
  */
- var Backbone = require('backbone')
-     , _ = require('underscore')
-     , EventEmitter = process.EventEmitter
-     ,  Cluster = require('cluster')
-     , Base = require('./Base')
+var Backbone = require('backbone')
+    , _ = require('underscore')
+    , EventEmitter = process.EventEmitter
+    ,  Cluster = require('cluster')
+    , Base = require('./Base')
     , assert = require('assert')
+    , async = require('async');
 
-     , async = require('async');
-
- var Baram = {};
+var Baram = {};
 
 
- /**
-  * singleton Object
-  * @type {{getInstance: Function}}
-  */
+/**
+ * singleton Object
+ * @type {{getInstance: Function}}
+ */
 var BaramService  = {
-     getInstance: function () {
-         if (this._instance === undefined) {
-             this._instance = new  Baram.Server();
-         }
-         return this._instance;
-     }
+    getInstance: function () {
+        if (this._instance === undefined) {
+            this._instance = new  Baram.Server();
+        }
+        return this._instance;
+    },
+    getDB : function() {
+        return this._instance.getDB();
+    }
 }
 
-    exports = module.exports =  BaramService;
+exports = module.exports =  BaramService;
 
 
 
@@ -35,38 +37,31 @@ var BaramService  = {
 
 
 
-    Baram.Server = function() {
-        Base.prototype.constructor.apply(this,arguments);
+Baram.Server = function() {
+    Base.prototype.constructor.apply(this,arguments);
 
-        this.settings = new Baram.config(new Backbone.Model());
-        this.storage = new Baram.Storage;
-        this.logger =   new Baram.Logger;
-        this.transport = new Baram.Transport;
-        this._webServices = {};
-        this._webIndex = 0;
+    this.settings = new Baram.config(new Backbone.Model());
+    this.storage = new Baram.Storage;
+    this.logger =   new Baram.Logger;
+    this.transport = new Baram.Transport;
+    this._webServices = {};
+    this._webIndex = 0;
 
+    var scope = this;
+    this.on('ready',function(){
+        scope.logger.init();
 
-        var scope = this;
+        var service = scope.get('service');
 
-        this.on('masterOnload',function(){
-            scope.set('application',true);
-            scope.set('appDir','application');
-             scope.start('cluster');
-        });
-        this.on('ready',function(){
-            scope.logger.init();
+        scope.listenService(service);
+    });
 
-            var service = scope.get('service');
+    this.on('initialize:transport',function(socketServer){
 
-            scope.listenService(service);
-        });
+        scope.trigger('startSocket',socketServer);
 
-        this.on('initialize:transport',function(socketServer){
-
-            scope.trigger('startSocket',socketServer);
-
-        });
-    };
+    });
+};
 
 Baram.Server.prototype.__defineGetter__('log', function () {
     var logger = this.logger;
@@ -77,101 +72,113 @@ Baram.Server.prototype.__defineGetter__('log', function () {
 
 
 
-     /**
-      * async 모듈함수들을 현재의 객체에 extend 함.
-      */
+/**
+ * async 모듈함수들을 현재의 객체에 extend 함.
+ */
 
-     _.extend(Baram.Server.prototype, Base.prototype, {
-        create: function(options){
+_.extend(Baram.Server.prototype, Base.prototype, {
+    create: function(options){
 
-            this.settings.start(options.config,this);
-        } ,
-         /**
-          * port 가 listen  하면..
-          */
-        start: function(type) {
+        this.settings.start(options.config,this);
+    } ,
 
-            if (this.get('appDir')) {
-                this.applicationFactory = new Baram.ApplicationFactory;
-                this.applicationFactory.create(type);
-            }
+    start: function() {
 
-        },
-        createAppInstance: function(className,APP) {
-
-            return {
-                className : className,
-                getInstance : function() {
-                    if (this._instance === undefined) {
-                        this._instance = new APP();
-                    }
-                    return this._instance;
-                },
-                get : function() {
-                    assert(this._instance);
-                    return this._instance;
-                }
-            }
-        },
-        getControllers: function() {
-
-           return  this.applicationFactory.getControllers();
-        },
-        getController: function(controllerName) {
-            assert(controllerName)
-            return  this.applicationFactory.getController(controllerName);
-        },
-        getWebServer: function() {
-            return this._webServices[this._webIndex];
-        },
-        get: function(name) {
-           return this.settings.get(name);
-        },
-        set: function(name,value) {
-
-            return this.settings.set(name,value);
-        },
-        configure : function(env,fn) {
-            var envs,args= [].slice.call(arguments);
-            fn = args.pop();
-            if (args.length) envs = args;
-            fn.call(this);
-            return this;
-        },
-         /**
-          * web port listen
-          * @param service
-          */
-        listenService : function(service) {
-             if (this.get('useDB')) {
-                 this.db = new  Baram.Db();
-                 this.db.create();
-             }
-            this._webServices[this._webIndex] =  new Baram.WebServiceManager();
-            this._webServices[this._webIndex] .create(service);
-            if (Cluster.isWorker || this.get('single')) {
-                this._webServices[this._webIndex].listen(function(server){
-                    this.transport.create(server);
-                });
-            } else {
-
-                this.trigger("masterOnload", {isMaster:true});
-            }
+        if (this.get('appDir')) {
+            this.ApplicationFactory = new Baram.ApplicationFactory;
+            this.ApplicationFactory.create();
         }
 
-    });
+    },
+    createAppInstance: function(className,APP) {
+        //this.ApplicationFactory.createAppInstance(className,APP);
+
+//            return {
+//
+//                getInstance : function() {
+////                    if (this._instance === undefined) {
+////                        this._instance = new APP();
+////                    }
+////                    return this._instance;get
+//
+//                    if (typeof application[className] === 'undefined') {
+//
+//                        application[className] = new APP();
+//                    }
+//                    return application[className];
+//                },
+//                get : function() {
+//                    assert(application[className]);
+//                    return application[className];
+//                }
+//            }
+    },
+    getController: function(controllerName) {
+        assert(controllerName)
+
+        return  this.ApplicationFactory.getController(controllerName);
+    },
+
+    getWebServer: function() {
+        return this._webServices[this._webIndex];
+    },
+    get: function(name) {
+        return this.settings.get(name);
+    },
+    set: function(name,value) {
+
+        return this.settings.set(name,value);
+    },
+    configure : function(env,fn) {
+
+        var envs,args= [].slice.call(arguments);
+        fn = args.pop();
+        if (args.length) envs = args;
+        fn.call(this);
+
+
+        return this;
+    },
+
+    /**
+     * web port listen
+     * @param service
+     */
+    listenService : function(service) {
+
+        if (this.get('useDB')) {
+            this.db = new  Baram.Db();
+            this.db.create();
+        }
 
 
 
-  Baram.Logger =  require('./Logger');
 
-  Baram.Storage = require('./Storage');
-  Baram.WebServiceManager =  require('./WebServiceManager');
-  Baram.config =  require('./configure');
-  Baram.triggerMethod = require('./triggerMethod');
-  Baram.Transport = require('./Transport');
-  Baram.ApplicationFactory = require('./ApplicationFactory');
-  Baram.Db = require('./database/Db');
+        this._webServices[this._webIndex] =  new Baram.WebServiceManager();
+        this._webServices[this._webIndex] .create(service);
+        if (Cluster.isWorker || this.get('single')) {
+            this._webServices[this._webIndex].listen(function(server){
+                this.transport.create(server);
+            });
+        }
+    },
+    getDB : function() {
+        return this.db;
+    }
+
+});
+
+
+
+Baram.Logger =  require('./Logger');
+
+Baram.Storage = require('./Storage');
+Baram.WebServiceManager =  require('./WebServiceManager');
+Baram.config =  require('./configure');
+Baram.triggerMethod = require('./triggerMethod');
+Baram.Transport = require('./Transport');
+Baram.ApplicationFactory = require('./ApplicationFactory');
+Baram.Db = require('./database/Db');
 
 
 

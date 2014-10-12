@@ -45,4 +45,5 @@ var App = Application.extend({
 
 });
 
-module.exports = Baram.getInstance().createAppInstance('main',App);
+exports.app  =App;
+exports.className  = 'main';

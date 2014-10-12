@@ -16,7 +16,7 @@ var Backbone = require('backbone')
 var App = Application.extend({
     type :'cluster',
     create : function() {
-        console.log(121212)
+
         this.on('workerEventTest',function(a,b,c){
             console.log(arguments)
         });
@@ -29,4 +29,7 @@ var App = Application.extend({
 
 });
 
-module.exports = Baram.getInstance().createAppInstance('ClusterController',App);
+
+
+exports.app  =App;
+exports.className  = 'ClusterController';

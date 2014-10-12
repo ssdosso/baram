@@ -34,7 +34,7 @@ _.extend(DB_driver.prototype, EventEmitter.prototype, {
     },
 
     connection : function() {
-     return this;
+        return this;
     },
     query : function(queryString, callback) {
         assert(queryString);
