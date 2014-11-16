@@ -56,7 +56,7 @@ _.extend(BlueBucket.prototype, Base.prototype, {
     get : function(file,callback) {
 
         var params = {Bucket:this.bucket,Key:file.name};
-        console.log(params)
+
         var buffer ;
 
         this.s3.client.getObject(params, function(err, data)

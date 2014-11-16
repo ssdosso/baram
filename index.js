@@ -43,7 +43,7 @@ baram.create({
  */
 baram.on("initialize:after", function(options){
     //test
-    console.log(options)
+
     baram.configure(function(){
 
         baram.set('application',true);

@@ -14,14 +14,12 @@
     "single": false,
     "useDB" : false,
     "db" : {
-        "driver":"Mongodb",
-        "hostname":"localhost:27017",
-        "username" :"root",
-        "database" :"mydb",
-        "password":"1234",
-        "pool": false
-
-
+        "driver":"mysql",
+        "hostname":"localhost",
+        "username" :"dbuser",
+        "database" :"dbname",
+        "password":"dbname",
+        "pool": true
     },
     "aws" :{
         "variants": {
@@ -35,14 +33,7 @@
         },
 
         "storage": {
-            "aws": {
-                "key" : "AKIAIK7222QGV2SD6W7A",
-                "secret" : "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",
-                "bucket" : "blueark-test-00"
-            },
-            "dir": {
-                "path" : "./public/images/"
-            }
+
         }
     }
 }

@@ -1,6 +1,3 @@
-/**
- * Created by chocoh on 2014-09-28.
- */
 
 var
     Baram = require('../../server/lib/Baram')
@@ -14,22 +11,23 @@ var Backbone = require('backbone')
 
 
 var App = Application.extend({
-    type :'cluster',
+    type :'web',
     create : function() {
 
-        this.on('workerEventTest',function(a,b,c){
-
+        Baram.getInstance().on('startSocket',function(socketServer){
+            socketServer.sockets.on('connection', function (socket) {
+                // console.log(socket)
+            });
         });
-
     },
     main: function(callback) {
+
+        callback();
 
     }
 
 
 });
 
-
-
 exports.app  =App;
-exports.className  = 'ClusterController';
+exports.className  = 'test';

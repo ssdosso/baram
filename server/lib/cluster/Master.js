@@ -65,8 +65,7 @@ _.extend(MasterServer.prototype,EventEmitter.prototype,{
 
 
         for (var i in controllers) {
-            console.log(i)
-            console.log(controllers[i])
+
             process.nextTick(function(){
                 controllers[i].emit.apply( controllers[i],params);
             });
