@@ -145,6 +145,7 @@ _.extend(DB.prototype, EventEmitter.prototype, {
         //this.settingModel.get('debug')
 
         this.driverName = this.config.driver;
+        console.log(this.driverName)
         var Database = require('./drivers/'+this.driverName);
         this.db = new Database();
         this.db.create(this.config);

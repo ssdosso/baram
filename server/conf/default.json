@@ -12,9 +12,9 @@
     "logDir" :"./logs",
     "application": false,
     "single": false,
-    "useDB" : false,
+    "useDB" : true,
     "db" : {
-        "driver":"mysql",
+        "driver":"Mongodb",
         "hostname":"localhost",
         "username" :"dbuser",
         "database" :"dbname",

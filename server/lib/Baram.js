@@ -41,7 +41,7 @@ Baram.Server = function() {
     Base.prototype.constructor.apply(this,arguments);
 
     this.settings = new Baram.config(new Backbone.Model());
-    this.storage = new Baram.Storage;
+  //  this.storage = new Baram.Storage;
     this.logger =   new Baram.Logger;
     this.transport = new Baram.Transport;
     this._webServices = {};
@@ -172,7 +172,7 @@ _.extend(Baram.Server.prototype, Base.prototype, {
 
 Baram.Logger =  require('./Logger');
 
-Baram.Storage = require('./Storage');
+//Baram.Storage = require('./Storage');
 Baram.WebServiceManager =  require('./WebServiceManager');
 Baram.config =  require('./configure');
 Baram.triggerMethod = require('./triggerMethod');

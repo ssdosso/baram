@@ -13,8 +13,8 @@ var EventEmitter = process.EventEmitter
     , Cluster = require('cluster')
     , ChildServer = require('./cluster/Child')
     , MasterServer = require('./cluster/Master')
-    , domain = require('domain')
-    , FB = require( 'fb' );
+    , domain = require('domain');
+
 
 
 
@@ -70,7 +70,7 @@ _.extend(WebServiceManager.prototype, Base.prototype, {
                   }
               }
 
-              Baram.getInstance().storage.create();
+              //Baram.getInstance().storage.create();
 
               if (Cluster.isMaster && !single) {
 
@@ -187,9 +187,9 @@ _.extend(WebServiceManager.prototype, Base.prototype, {
                         var session = require('cookie-session');
                         var bodyParser = require('body-parser');
 
-                        app.use(bodyParser()); // pull information from html in POST
+       //                 app.use(bodyParser()); // pull information from html in POST
                         app.use(bodyParser.json());
-                        app.use(bodyParser.urlencoded());
+                  //      app.use(bodyParser.urlencoded());
                         //todo 테스트 필요...
                         app.use(session({
                             keys: ['key1', 'key2'],

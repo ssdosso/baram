@@ -4,7 +4,7 @@ var EventEmitter = process.EventEmitter
     , Baram = require('./Baram')
 
     , Base = require('./Base')
-    , AWS = require('aws-sdk')
+
     , async = require('async')
     , io = require('socket.io')
     , domain = require('domain')
