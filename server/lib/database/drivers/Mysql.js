@@ -1,134 +1,218 @@
-var EventEmitter = process.EventEmitter
-    ,_ = require('underscore')
+var _ = require('underscore')
     , Mysql = require('mysql')
-    , Baram = require('../../Baram')
+    , Garam = require('../../Garam')
     , DB_driver = require('../DB_driver')
 //,MongoClient = require('mongodb').MongoClient
     , format = require('util').format
     , assert= require('assert');
 
-
+const ConnectionLimit = 10;
 
 //1
+
 module.exports  = DB_driver.extend({
     conn :null,
     close : function() {
-        var conn = this.conn.isConn();
+        let conn = this.conn.isConn();
         if (conn) {
             this.conn.close();
         }
     },
-    connection : function() {
-        var self = this;
+
+    connectionAsync :async  function () {
+        let self = this,conn,config;
+        return new Promise((resolved,rejected)=>{
+            resolved(0);
+        });
+    },
+    connection : function(callback) {
+
+        let self = this,conn,write_conn,read_conn,replica=false,debug=false;
 
         return  (function() {
+            this.conn = (function() {
 
-            if (this.get('pool') === true) {
-                self.conn = Mysql.createPool({
-                    host     : this.get('hostname'),
-                    user     : this.get('username'),
-                    password : this.get('password'),
-                    database : this.get('database')
-                });
+                 conn = null;
+                 let cluster=false,clusterInfo,connectList=[];
+                debug =self.get('debug')
+                function _connection() {
+                    if (!conn) {
 
-                self.conn.on('end', function(err) {
-                    console.log('mysql close');
-                });
-            } else {
+                        if (self.get('replica')) {
+                            replica = true;
+                            let wOptions = self.get('replica').write;
+                            let rOptions = self.get('replica').read;
 
-                this.conn = (function(){
-                    var conn = null;
-                    return {
-                        isConn : function() {
-                            return conn ? true : false;
-                        },
-                        close : function() {
-                            conn.end();
-                            delete conn;
-                            conn = null;
-                        },
-                        getConnection : function(callback) {
-                            if (!conn) {
-                                console.log('없음');
-                                conn = Mysql.createConnection({
-                                    host     : self.get('hostname'),
-                                    user     : self.get('username'),
-                                    password : self.get('password'),
-                                    database : self.get('database')
+                            conn =  true;
+
+                              (function (){
+                                write_conn =  Mysql.createPool({
+                                    connectionLimit : wOptions.poolLimit,
+                                    host     : wOptions.hostname,
+                                    port     : wOptions.port,
+                                    user     : wOptions.username,
+                                    password : wOptions.password,
+                                    database : wOptions.database,
+                                    supportBigNumbers :true
+                                    // bigNumberStrings : true
                                 });
 
-                                conn.connect(function(err) {
-                                    if (err) {
-                                        switch(err.code) {
-                                            case 'ER_BAD_DB_ERROR':
-                                                console.log('ER_BAD_DB_ERROR: Unknown database')
-                                                break;
-                                            case 'ER_ACCESS_DENIED_ERROR':
-                                                console.log(' ER_ACCESS_DENIED_ERROR: Access denied for user ')
-                                                break;
-                                            default :
-                                                console.error('error connecting: ' + err.stack);
-                                                break;
-                                        }
-                                        callback(err);
+                                  write_conn.getConnection(function(err, connection) {
+                                      // connected! (unless `err` is set)
+                                      if (err) {
+                                          Garam.logger().error('Mysql Connect Error : ',err);
+                                      }
+                                      Garam.logger().info('mysql write conn',wOptions.hostname,'replica',replica);
 
-                                        return;
+                                      connectList.push(1);
+                                      _next(err,'write',connection);
+                                  });
+                            })();
+
+
+                            (function (){
+                                read_conn =  Mysql.createPool({
+                                    connectionLimit :  rOptions.poolLimit,
+                                    host     : rOptions.hostname,
+                                    port     : rOptions.port,
+                                    user     : rOptions.username,
+                                    password : rOptions.password,
+                                    database : rOptions.database,
+                                    supportBigNumbers :true
+                                    // bigNumberStrings : true
+                                });
+
+
+                                read_conn.getConnection(function(err, connection) {
+                                    // connected! (unless `err` is set)
+                                    if (err) {
+                                        Garam.logger().error('Mysql Connect Error : ',err);
                                     }
+                                    Garam.logger().info('mysql read conn',rOptions.hostname,'replica',replica);
+
+                                    connectList.push(1);
+                                    _next(err,'read',connection);
+                                });
+                            })();
+
+
+
+                            function _next(err,type,connection) {
+
+                                    if (connectList.length ===2) {
+                                        callback(err);
+                                    }
+
+                            }
+
+                        } else {
+                            conn =   Mysql.createPool({
+                                connectionLimit : ConnectionLimit,
+                                host     : self.get('hostname'),
+                                port      : self.get('port'),
+                                user     : self.get('username'),
+                                password : self.get('password'),
+                                database : self.get('database'),
+                                supportBigNumbers :true
+                                // bigNumberStrings : true
+                            });
+                            conn.getConnection(function(err, connection) {
+                                // connected! (unless `err` is set)
+                                if (err) {
+                                    Garam.logger().error('Mysql Connect Error : ',err);
+                                }
+
+                                if (typeof callback !== 'undefined') {
+                                    callback(err, connection);
+                                }
+                            });
+                        }
+
+
+                    }
+                }
+
+                _connection.call(this);
+
+
+                return {
+
+                    isDebug : function () {
+                        return debug;
+                    },
+                    isConn : function() {
+                        return conn ? true : false;
+                    },
+                    close : function() {
+                        conn.close();
+                        delete conn;
+                        conn = null;
+                    },
+                    getConnection : function(callback,mode) {
+                        if (!replica) {
+                            if (!conn) {
+                                _connection(function(){
                                     callback(false,conn);
-                                    console.log('connected as id ' + conn.threadId);
                                 });
                             } else {
-                                callback(false,conn);
+                                conn.getConnection(function(err, connection) {
+                                    callback(err, connection);
+                                });
+                            }
+                        } else {
+                            if (!conn) {
+                                _connection(function(){
+                                    if (mode ===1 || mode ===false) {
+                                        read_conn.getConnection(function(err, connection) {
+                                            callback(err, connection);
+                                        });
+                                    } else {
+                                        write_conn.getConnection(function(err, connection) {
+                                            callback(err, connection);
+                                        });
+                                    }
+                                });
+                            } else {
+                                if (mode ===1 || mode ===false) {
+                                    read_conn.getConnection(function(err, connection) {
+                                        callback(err, connection);
+                                    });
+                                } else {
+                                    write_conn.getConnection(function(err, connection) {
+                                        callback(err, connection);
+                                    });
+                                }
+
+                            }
+                        }
+
+
+                    },
+                    getWriteConnection : function(callback,mode) {
+                        if (!conn) {
+                            _connection(function(){
+                                write_conn.getConnection(function(err, connection) {
+                                    callback(err, connection);
+                                });
+                            });
+                        } else {
+                            if (!replica) {
+                                conn.getConnection(function(err, connection) {
+                                    callback(err, connection);
+                                });
+                            } else {
+                                write_conn.getConnection(function(err, connection) {
+                                    callback(err, connection);
+                                });
                             }
 
                         }
+
                     }
-                })();
-
-
-            }
-
+                }
+            })();
 
         }).call(this);
-
-
-    },
-    query : function(queryString, callback) {
-        assert(queryString);
-        var Queries;
-        if (callback === undefined) {
-            assert(0);
-        }
-        if(_.isArray(callback)) {
-            Queries = callback;
-            callback = arguments[2];
-            this.conn.getConnection(function(err,connection) {
-                if(err)  {
-                    Baram.getInstance().log.warn(err);
-                }
-                connection.query(queryString, Queries, function(err, rows) {
-                    callback(err,rows);
-                    if (typeof connection.release === 'function' ) {
-                        connection.release();
-                    }
-                });
-            });
-        } else {
-            this.conn.getConnection(function(err,connection) {
-                if(err)  {
-                    Baram.getInstance().log.warn(err);
-                }
-
-                connection.query( queryString, function(err, rows) {
-                    callback(err,rows);
-                    if (typeof connection.release === 'function' ) {
-                        connection.release();
-                    }
-
-                });
-            });
-        }
-
 
 
     }

@@ -1,6 +1,6 @@
-var EventEmitter = process.EventEmitter
+var EventEmitter = require('events').EventEmitter
     ,_ = require('underscore')
-    , Baram = require('../Baram')
+    , Garam = require('../Garam')
 
     , format = require('util').format
     , assert= require('assert');
@@ -9,7 +9,6 @@ exports = module.exports = DB_driver;
 
 function DB_driver () {
 
-    this.trigger = require('./../triggerMethod');
 }
 
 
@@ -30,7 +29,7 @@ _.extend(DB_driver.prototype, EventEmitter.prototype, {
         }
     },
     log  : function(){
-        return Baram.getInstance().log;
+        return Garam.getInstance().log;
     },
 
     connection : function() {
@@ -51,4 +50,4 @@ _.extend(DB_driver.prototype, EventEmitter.prototype, {
 
 });
 
-DB_driver.extend = Baram.extend;
+DB_driver.extend = Garam.extend;

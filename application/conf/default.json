@@ -1,0 +1,118 @@
+{
+
+    "serverType":"api",
+    "testMode":true,
+    "ssl" :false,
+    "clusterMode" : true,
+    "logger_s3": false,
+    "workerConnectionDC":true,
+    "localServerIP" :"ls",
+    "aliasDomain":"127.0.0.1",
+    "serverSSL" :false,
+    "portInfo":{
+        "mode" :"number",
+        "maxCount":1,
+        "portType" : 0,
+        "defaultPort" : 8230
+    },
+    "userPacketDebug":true,
+    "service" :  {
+        "transport" : true,
+        "transportType": "socket.io",
+
+        "type":"http",
+        "transportOptions": {},
+        "reidsConn" : false,
+        "redis":{"host":"127.0.0.1","port":6379},
+
+        "sslKey":"www.test.com.key",
+        "sslCert":"www.test.com.crt",
+        "sslPass":"test1111",
+
+        "debug" :false,
+        "origin":["*"]
+    },
+
+    "logDir" :"./logs",
+    "useDB" : true,
+    "masterDB" : true,
+
+    "db" : [
+
+        {
+            "namespace":"gameredis",
+            "model_dir":"gameredis",
+            "driver":"Redis",
+            "hostname":"127.0.0.1",
+            "port":6379,
+            "database" :1,
+            "username" :"",
+            "password":"",
+            "procedure" :false,
+            "redisModel" : true
+
+        },
+        {
+            "namespace":"gameLogs",
+            "driver":"Mysql",
+            "hostname":"127.0.0.1",
+            "username" :"root",
+            "database" :"testDB",
+            "password":"test11!",
+            "port":"3306",
+            "procedure" :true,
+
+
+            "debug": true
+
+        },
+
+        {
+            "namespace":"survival",
+            "driver":"Mysql",
+            "hostname":"127.0.0.1",
+            "username" :"root",
+            "database" :"testDB",
+            "password":"test11!",
+            "port":"3306",
+            "procedure" :true,
+
+
+            "debug": true,
+            "replica" : {
+                "write" : {
+                    "hostname":"127.0.0.1",
+                    "username" :"root",
+                    "database" :"testDB",
+                    "password":"test11!",
+                    "port":"3306"
+                },
+                "read" : {
+                    "hostname":"127.0.0.1",
+                    "username" :"root",
+                    "database" :"testDB",
+                    "password":"test11!",
+                    "port":"3306"
+                }
+            }
+        }
+    ],
+
+    "serviceMode" :"local",
+    "cryptoUse" : false,
+    "loggerLevel" :"user",
+    "loggerScreenLevel" :"packet",
+    "cryptopass" : "123456789012345678901234",
+    "ispacket" : true,
+    "sessionKey": "aaaaa",
+    "heartChargeTime": 120,
+
+    "region": "east",
+
+    "heartbeat" : {
+        "heartbeatTimeout" : 120,
+        "heartbeatInterval":50
+    }
+
+
+}

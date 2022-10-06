@@ -1,47 +1,83 @@
-var EventEmitter = process.EventEmitter
-    ,_ = require('underscore')
+var _ = require('underscore')
     , fs = require('fs')
-    , Baram = require('./Baram')
+    , Garam = require('./Garam')
   
     , Base = require('./Base')
     , assert= require('assert');
 
 exports = module.exports = RouterFactory;
 
-function RouterFactory (app,webManager) {
+function RouterFactory (app,webManager,callback) {
 
     this.app = app;
     this.webManager = webManager;
     this._routers = {};
-};
+    this._callback = typeof callback === 'function' ? callback : undefined;
+}
 
 _.extend(RouterFactory.prototype, Base.prototype, {
-    addRouter:function (name, router) {
-        this._routers[name] = new router();
-        this._routers[name].init(this.app,this.webManager);
+    add : function(name,router) {
+        this._routers[name] = router;
     },
-    addRouters : function(path) {
+    addRouter:function (name, Router) {
+       var router = new Router();
+        router.init(this.app,this.webManager);
+        this.add(name,router);
+    },
+    addRouters : function(path,callback) {
 
-        //var classes = require(path);
         var self = this;
         if(!fs.existsSync(path)) {
             path = 'server/'+path;
         }
+        var list = fs.readdirSync(path);
+        var total =list.length;
 
-        fs.readdirSync(path).forEach(function (file) {
+
+        var work =0;
+        list.forEach(function (file,i) {
+
             var stats = fs.statSync(process.cwd()+'/'+path + '/' + file);
             if (stats.isFile()) {
                 var routerClasses = require(process.cwd()+'/'+path + '/' + file);
                 var isClassName = false;
+
+
                 for (var className in routerClasses) {
                     isClassName = true;
                     self.addRouter(className, routerClasses[className]);
+                    work++;
+                }
+
+                if (total === work) {
+
+                    Garam.getInstance().emit('routerComplete');
+                    if (self._callback !== undefined) {
+                        self._callback();
+                    }
                 }
                 if (!isClassName) {
-                   console.error(file + ' module.exports does not exist.');
+                    console.error(file + ' module.exports does not exist.');
                 }
             }
         });
+
+
+        //fs.readdirSync(path).forEach(function (file) {
+        //    var stats = fs.statSync(process.cwd()+'/'+path + '/' + file);
+        //    if (stats.isFile()) {
+        //        var routerClasses = require(process.cwd()+'/'+path + '/' + file);
+        //        var isClassName = false;
+        //        for (var className in routerClasses) {
+        //
+        //            isClassName = true;
+        //            self.addRouter(className, routerClasses[className]);
+        //        }
+        //        if (!isClassName) {
+        //           console.error(file + ' module.exports does not exist.');
+        //        }
+        //    }
+        //});
 
     }
 });

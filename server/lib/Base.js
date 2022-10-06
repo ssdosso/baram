@@ -1,9 +1,10 @@
-var EventEmitter = process.EventEmitter
+var EventEmitter = require('events').EventEmitter
     ,_ = require('underscore')
     , fs = require('fs')
-    , Baram = require('./Baram')
+    , Garam = require('./Garam')
     , async = require('async')
-    , Event = require('./Event')
+
+
     , assert= require('assert');
 
 exports = module.exports = Base;
@@ -11,9 +12,11 @@ exports = module.exports = Base;
 
 function Base() {
 
-    this.trigger = require('./triggerMethod');
+    //this.trigger = require('./triggerMethod');
 
 }
+
+
 _.extend(Base.prototype,async);
 _.extend(Base.prototype, EventEmitter.prototype, {
 

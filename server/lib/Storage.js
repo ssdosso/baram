@@ -1,126 +1,118 @@
-var EventEmitter = process.EventEmitter
+var EventEmitter = require('events').EventEmitter
     ,_ = require('underscore')
     , fs = require('fs')
-    , Baram = require('./Baram')
-
-    , Base = require('./Base')
-    , AWS = require('aws-sdk')
     , async = require('async')
-    , assert= require('assert');
+    , assert= require('assert')
+    , AWS = require('aws-sdk')
 
-exports = module.exports = S3storage;
+    , Garam = require('./Garam')
+    , Base = require('./Base');
 
-function S3storage (mgr, name) {
-    this.trigger = require('./triggerMethod');
 
-};
 
-var BlueBucket = function(optoins) {
-       this.bucket = optoins.Bucket;
 
-       this.s3 =  new AWS.S3({Bucket:this.bucket});
+exports = module.exports = Storage;
+
+function Storage (mgr, name) {
+    Base.prototype.constructor.apply(this,arguments);
+    this._BucketList = {};
 }
 
-_.extend(BlueBucket.prototype, Base.prototype, {
-    getProfile: function() {
-        var self = this;
-        var param = {
-            view_uid : req.session.uid,
-            uid :  req.session.uid,
-            session_id : req.session.session_id
+
+_.extend(Storage.prototype, Base.prototype, {
+    createBucket : function(bucketName,options) {
+        //this._bukcket =  new AWS.S3({Bucket:bucketName});
+        if (typeof options === 'undefined') {
+            assert(0);
         }
+        this._BucketList[bucketName] = new Bucket(options);
 
-        this.request('post','profile/view',param,function(response,data){
-            _.extend(data,data.profile);
-            self.renderToJson(res,data);
-        })
     },
-    put : function(fileinfo,next){
-        var self = this;
-        var file = fileinfo.file;
-        var extension = file.name.split('.')[1];
-
-
-        fs.readFile(file.path, function(err, data) {
-            if (err) throw err;
-            var params = {Bucket:self.bucket,Body: data,Key:fileinfo.username+'.'+ extension};
-            self.s3.putObject(params, function() {
-
-                next();
-            })
+    uploadFile : function(AWSConfig, bucketName, saveFolder, saveVersion, fileDir, fileName, callback) {
+        AWS.config.update(AWSConfig);
+        var s3 = new AWS.S3();
+        var saveData = null;
+        var file = fs.createReadStream(fileDir + '/' + fileName, {flags: 'r', autoClose: true, encoding: 'utf-8'} );
+        file.on('data', function(data) {
+            if(!saveData) {
+                saveData = data;
+            } else {
+                saveData += data;
+            }
+        });
+        file.on('end', function() {
+            console.log(saveData);
+            if(saveData) {
+                process.nextTick(function () {
+                    var params = {Bucket: bucketName, Key: saveFolder + saveVersion + '/' + fileName, Body: saveData};
+                    s3.putObject(params, function (err) {
+                        if (err) {
+                            Garam.logger().error(err);
+                            callback(err);
+                            return;
+                        }
+                        Garam.logger().info('Uploading to S3 is success');
+                        callback(null);
+                    })
+                });
+            }else {
+                callback(null);
+            }
+        });
+        file.on('error', function(e) {
+            Garam.logger().error(e);
+            callback(e);
         });
 
+        /*fs.readFile(fileDir + '/' + fileName, 'utf-8', function(err, data) {
+         setTimeout(function() {
+         console.log(data);
+         callback();
+         }, 1000)
 
-
-    } ,
-    get : function(file,callback) {
-
-        var params = {Bucket:this.bucket,Key:file.name};
-
-        var buffer ;
-
-        this.s3.client.getObject(params, function(err, data)
-        {
-
-
-            if (data === null) {
-                callback(data);
-            }
-            if(err == null)
-            {
-
-                var buff = new Buffer(data.Body, "binary"); //i've tried everything.
-                callback(buff);
-//                var fd = fs.openSync("some_local_binary_file", "w");
-//                fs.writeSync(fd, buff, 0, buff.length,0);
-            }
-
-        });
-//       this.s3.getObject(params).
-//            on('httpData', function(chunk) {
-//               console.log(chunk)
-//            }).
-//            on('httpDone', function() {
-//                //console.log(buffer)
-//            }).
-//            send();
-
-
+         /!* var params = {Bucket: bucketName, Key: saveFolder + saveVersion + '/' + fileName, Body: data};
+         s3.putObject(params, function (err) {
+         if (err) {
+         Garam.logger().error(err);
+         callback();
+         } else {
+         Garam.logger().info('Uploading to S3 is success');
+         callback();
+         }
+         });*!/
+         });*/
     }
 });
 
+function Bucket() {
 
-_.extend(S3storage.prototype, EventEmitter.prototype, {
-      create : function() {
-//          var config= Baram.getInstance().config.s3;
-         // var s3 = new AWS.S3();
-         // AWS.config.loadFromPath('./server/conf/s3.json');
+}
 
-      } ,
-      addBucket: function(targetBucket) {
-            return new BlueBucket({Bucket:targetBucket});
-      },
-      put : function(file,next){
-          var s3bucket = new AWS.S3({Bucket:'Baram-test-00'});
-          var self = this;
+/*
+ { "accessKeyId": "AKIAO6SKBQUKPMTR24ZQ",
+ "secretAccessKey": "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",
+ "region": "cn-north-1" }
+ */
+_.extend(Bucket.prototype, Base.prototype, {
+    create : function(options) {
+        if (_.isEmpty(options.accessKeyId)) {
+            Garam.logger().error('accessKeyId is required');
+            return;
+        }
+        if (_.isEmpty(options.secretAccessKey)) {
+            Garam.logger().error('secretAccessKey is required');
+            return;
+        }
+        if (_.isEmpty(options.region)) {
+            Garam.logger().error('region is required');
+            return;
+        }
 
-         fs.readFile(file.path, function (err, data) {
-              if (err) throw err;
-              var params = {Bucket:'Baram-test-00',Body: data,Key:file.name};
-              s3bucket.putObject(params, function() {
-                  next();
-              })
-          });
-      } ,
-      get : function() {
-          s3bucket.getObject({Bucket:'Baram-test-00',Key:file.name}).
-                      on('httpData', function(chunk) {
-                          wfile.write(chunk);
-                      }).
-                      on('httpDone', function() {
-                          wfile.end();
-                      }).
-                      send();
+        var S3 = new AWS.S3();
 
-      }
+
+        AWS.config.update({accessKeyId: 'akid', secretAccessKey: 'secret'});
+        AWS.config.update({region: 'us-west-1'});
+    }
+
 });

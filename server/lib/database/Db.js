@@ -1,31 +1,93 @@
-var EventEmitter = process.EventEmitter
+var EventEmitter = require('events').EventEmitter
     ,_ = require('underscore')
     , fs = require('fs')
-    , Baram = require('./../Baram')
+    , Garam = require('./../Garam')
     , sanitizer = require('sanitizer')
     , async = require('async')
+    , ProcedureFactory = require('./model/ProcedureFactory')
+    , DB_Store = require('./DB_Store')
+    , RedisFactory = require('./model/ModelFactory')
+    , MemoryFactory = require('./model/MemoryFactory')
     , assert= require('assert');
 
 exports = module.exports = DB;
 
 function DB (mgr, name) {
-    this.trigger = require('./../triggerMethod');
+   // this.trigger = require('./../triggerMethod');
 
-    if (Baram.getInstance().get('debug')) {
-        console.log('debug mode start');
-        this.config =Baram.getInstance().get('debug_config').db
 
-    } else {
-        this.config = Baram.getInstance().get('db');
-    }
 
-};
+
+}
 
 
 _.extend(DB.prototype, EventEmitter.prototype, {
     db: null,
+    getNohm : function() {
+      return this.db.getNohm();
+    },
     get : function(name) {
-        return  this.db.get(name);
+        this.db.get.apply( this.db,arguments);
+    },
+    getOptions : function() {
+      return this.db.getAllOptions();
+    },
+    addProcedure : function(dpname,sql) {
+        this.db_store.add(dpname,sql);
+    },
+    getDP : function(dpname) {
+        return this.db_store.get(dpname);
+    },
+    getProcedure : function (dpname) {
+        return this.db_store.get(dpname);
+    },
+    getModel : function (dpname) {
+     
+        return this.db_store.get(dpname);
+    },
+    getNamespace : function() {
+
+        this.db.getNamespace();
+    },
+
+    initModel : async function() {
+
+
+        switch (this.config.driver.toLowerCase()) {
+            case 'redis':
+                this.modelFactory = new RedisFactory(this.config.namespace,this.config);
+                break;
+            case 'mysql':
+            case 'mssql':
+
+                this.modelFactory = new ProcedureFactory(this.config.namespace);
+                break;
+            case 'memory':
+                this.modelFactory = new MemoryFactory(this.config.namespace,this.config);
+                break;
+        }
+      return  this.modelFactory.create();
+
+    },
+    /**
+     * reids 추가 모델 등록
+     * @param defaultName
+     * @param modelName
+     */
+    afterCreateModel : function(targetModelFolder,modelFile,modelName,callback) {
+        var appDir = Garam.getInstance().get('appDir');
+        var file =process.cwd()+'/'+appDir+'/model/'+targetModelFolder+'/'+modelFile;
+
+        if(!fs.existsSync(file+'.js')) {
+            Garam.getInstance().log.error('not found model');
+            return;
+        }
+
+        var Model = require(file);
+        var t = new Model();
+        t.setName(modelName);
+        this.modelFactory.addModel(t);
+        callback(t);
     },
     close : function() {
         this.db.close();
@@ -54,146 +116,95 @@ _.extend(DB.prototype, EventEmitter.prototype, {
             }
         }):null;
     },
+    createConnect : async function(config,callback) {
+        this.config = config;
+        this.db_store = new DB_Store(this.config.namespace);
 
-    update : function(tableOptions,callback) {
-        var userCallback = function() {},queryString,options,queries;
-        var table = tableOptions.table;
-        var fields = tableOptions.fields;
-        var values = tableOptions.values;
-        var where = tableOptions.where;
-        assert(table);
-        assert(fields);
-        assert(values);
-        assert(where);
+        return new Promise((resolve, reject) => {
+            let cfg = this.config;
+            if(!cfg.driver) {
 
 
-        //UPDATE `db_zaiseoul`.`members` SET `name`='1111 1112' WHERE `id`='15224';
-        var query = "UPDATE "+table+' SET',field_str='';
-        for(var i = 1;i <= fields.length; i ++) {
-
-            field_str +="`"+fields[i-1]+"`='"+sanitizer.escape(values[i-1])+"'";
-            if (i !== fields.length) {
-                field_str +=',';
+                return   reject(' not find  db driver')
             }
-        }
-        query += field_str +" WHERE "+where;
-        console.log(query)
-        this.query(query,function(err,rs){
-            userCallback(err,rs);
+            if(!cfg.namespace) {
+
+                return   reject('not find  db namespace')
+            }
+
+
+            let Database = require('./drivers/'+cfg.driver);
+            this.db = new Database();
+            this.db.create(cfg);
+            Garam.getInstance().log.info(' connected DB  ',cfg.driver,cfg.namespace)
+            this.db.connection(function(){
+
+                Garam.getInstance().log.info(' connection DB  ',cfg.driver,cfg.namespace)
+                resolve();
+            });
         });
 
-        return {
-            done : function(callback) {
-                if(typeof callback === 'function') {
-                    userCallback = callback;
-                } else {
-                    assert(0);
-                }
-            }
-        }
+        // db_create.call(this);
+        //
+        // function db_create() {
+        //     var cfg = this.config;
+        //
+        //     if(!cfg.driver) {
+        //         Garam.logger().error(' not find  db driver ');
+        //         return;
+        //     }
+        //     if(!cfg.namespace) {
+        //         Garam.logger().error(' not find  db namespace');
+        //         return;
+        //     }
+        //
+        //     var Database = require('./drivers/'+cfg.driver);
+        //     this.db = new Database();
+        //     this.db.create(cfg);
+        //     Garam.getInstance().log.info(' connected DB  ',cfg.driver,cfg.namespace)
+        //     this.db.connection(function(){
+        //
+        //         Garam.getInstance().log.info(' connection DB  ',cfg.driver,cfg.namespace)
+        //         callback();
+        //     });
+        //     //this.emit('ready');
+        // }
 
 
     },
-    insert : function(tableOptions,callback) {
 
-        var userCallback = function() {},queryString,options,queries;
-        var table = tableOptions.table;
-        var fields = tableOptions.fields;
-        var values = tableOptions.values;
-        assert(table);
-        assert(fields);
-        assert(values)
-        var query = "insert into "+table,field_str='(',values_str='VALUES(';
+    connection : function() {
 
-        for(var i = 1;i <= fields.length; i ++) {
+        // if (this.db.config.namespace =='memory') {
+        //     console.log('11111',this.db.conn)
+        // }
 
-            field_str +="`"+fields[i-1]+"`"
-            if (i !== fields.length) {
-                field_str +=',';
-            } else {
-                field_str +=')';
-            }
-        }
-        for(var i = 1;i <= values.length; i ++) {
-            values_str +="'"+sanitizer.escape(values[i-1])+"'"
-            if (i !== values.length) {
-                values_str +=',';
-            } else {
-                values_str +=')';
-            }
-        }
-        query += field_str +" "+values_str;
-        this.query(query,function(err,rs){
-            userCallback(err,rs);
-        });
-
-        return {
-            done : function(callback) {
-                if(typeof callback === 'function') {
-                    userCallback = callback;
-                } else {
-                    assert(0);
-                }
-            }
-        }
-
+        return this.db.conn;
     },
-    create : function() {
-        if(!this.config.driver) {
-            Baram.getInstance().log.info('db driver not find ')
-        }
-        //this.settingModel.get('debug')
 
-        this.driverName = this.config.driver;
-        console.log(this.driverName)
-        var Database = require('./drivers/'+this.driverName);
-        this.db = new Database();
-        this.db.create(this.config);
 
-        this.db.connection();
 
+
+    /**
+     * 세부 쿼리
+     */
+    query : function() {
+        this.db.query.apply( this.db,arguments);
+    },
+
+
+    /**
+     *
+     * @param procedure
+     * @param params
+     * @param callback Or OubtParams
+     * @param callback
+     */
+     execute :  function() {
+
+        this.db.execute.apply( this.db,arguments);
 
     }
-    ,
-    select: function(queryString) {
-        var userCallback = function() {},queryString,options,queries;
-        var args = Array.prototype.slice.apply(arguments);
-        if (args.length > 1) {
-            queryString = args[0];
-            options = args[1];
-            this.query(queryString,options,function(err,rows){
-                userCallback(err,rows);
-            });
-        } else {
-            queryString = args[0];
-            this.query(queryString,function(err,rows){
-                userCallback(err,rows);
-            });
-        }
 
-        return {
-            done : function(callback) {
-                if(typeof callback === 'function') {
-                    userCallback = callback;
-                } else {
-                    assert(0);
-                }
-            }
-        }
-    },
-    query: function(queryString,callback){
-        var Queries;
-        assert(queryString);
-        if (callback === undefined) {
-            assert(0);
-        }
 
-        if(_.isArray(callback)) {
-            Queries = callback;
-            callback = arguments[2];
-            this.db.query(queryString,Queries,callback);
-        } else {
-            this.db.query(queryString,callback);
-        }
-    }
 });

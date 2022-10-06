@@ -1,6 +1,5 @@
-var EventEmitter = process.EventEmitter
-    ,_ = require('underscore')
-    , Baram = require('../../Baram')
+var _ = require('underscore')
+    , Garam = require('../../Garam')
     , DB_driver = require('../DB_driver')
     ,MongoClient = require('mongodb').MongoClient
     , format = require('util').format
@@ -11,7 +10,7 @@ exports = module.exports = Mongodb;
 function Mongodb () {
 
 //27018
-};
+}
 
 //mongod.exe D:\work\monogoData
 module.exports  = DB_driver.extend({
@@ -22,14 +21,14 @@ module.exports  = DB_driver.extend({
     },
     connection : function() {
         var host = this.config.hostname;
-        MongoClient.connect('mongodb://'+this.get('hostname')+':/'+this.get('database'), function(err, db) {
-
-            if (err) {
-                throw err;
-            }
-
-            Baram.getInstance().log.info('mongodb connect success ');
-
-        });
+        //MongoClient.connect('mongodb://'+this.get('hostname')+':/'+this.get('database'), function(err, db) {
+        //
+        //    if (err) {
+        //        throw err;
+        //    }
+        //
+        //    Garam.getInstance().log.info('mongodb connect success ');
+        //
+        //});
     }
 });

@@ -1,10 +1,11 @@
-var EventEmitter = process.EventEmitter
-    ,_ = require('underscore')
+ var _ = require('underscore')
     , fs = require('fs')
     , request = require('request')
     , winston = require('winston')
     , Cluster = require('cluster')
-    , Baram = require('../Baram')
+    , BaseProcessFactory = require('./BaseProcessFactory')
+    , Garam = require('../Garam')
+    , BaseWorker = require('./BaseWorker')
     , assert= require('assert');
 
 
@@ -15,73 +16,92 @@ var EventEmitter = process.EventEmitter
  */
 exports = module.exports = MasterServer;
 
-function MasterServer () {}
+function MasterServer () {
+    BaseProcessFactory.prototype.constructor.apply(this,arguments);
+    this._workers ={};
 
-_.extend(MasterServer.prototype,EventEmitter.prototype,{
-    addMessageEvent : function(id) {
+}
+
+_.extend(MasterServer.prototype,BaseProcessFactory.prototype,{
+    create : async function(callback) {
         var self = this;
-        Cluster.workers[id].on('message', function(data){
-            self.onMessage(data,id);
+        /**
+         * 워커에서 실제 포트가 열려 있으면....
+         */
+        //Cluster.on('listening', function(worker, address) {
+        //
+        //    self.workerStatusCheck(worker,address);
+        //    //console.log("A worker is now connected to " + address.address + ":" + address.port);
+        //});
+
+        Cluster.on('online', function(worker) {
+
+
         });
+        // this.addTransactions('master',this,function(){
+        //     callback();
+        // });
+
+        await this.addTransactions('master',this);
+
     },
+
     isMaster : function() {
         return true;
     },
-    create : function() {
-        var self = this;
-        this._workers = {};
-        Object.keys(Cluster.workers).forEach(function(id) {
-            self.addMessageEvent(id);
-
-        });
-        Cluster.on('exit', function(worker, code, signal) {
-            var now = new Date;
-            var exitCode = worker.process.exitCode;
-            Baram.getInstance().log.warn('web process died code:'+exitCode);
-            delete self._workers[worker.id];
-            Cluster.fork();
-            Object.keys(Cluster.workers).forEach(function(id) {
-                if (!self._workers[id]) {
-                    self._workers[id] = {};
-                    self._workers[id].process = true;
-                    self.addMessageEvent(id);
-                }
-            });
-        });
-
-        this.on('onWorks', function (data, id) {
-            Baram.getInstance().log.info('worker ID : ' + id);
-            self._workers[id]  = {};
-            self._workers[id].process = true;
-
-        });
-    }  ,
-    onMessage: function(packet,id) {
-        packet.id = id;
-        var name = (packet.pid)? packet.pid : 'message';
-        var params = [name].concat(packet.args),self=this;
-
-        var controllers = Baram.getInstance().getControllers();
+    createWorker : function(config) {
+       
+        let worker = Garam.getCluster().fork();
+        let workerId = worker.id;
 
 
-        for (var i in controllers) {
 
-            process.nextTick(function(){
-                controllers[i].emit.apply( controllers[i],params);
-            });
-        }
+        this._workers[workerId] = new BaseWorker();
 
-
+        this._workers[workerId].create(worker,config);
+        this.setTransactionEvent(this._workers[workerId]);
+        Garam.getInstance().emit('listenWorker',config.port,workerId);
+        return  this._workers[workerId];
     },
-    send: function(data){
-        var packet = {
-            ev :'message',
-            type:'sendMessage',
-            pid : 'message',
-            args: data
+
+    getWorker : function(workerId) {
+        assert(workerId);
+        return  this._workers[workerId];
+    },
+    send : function (workerId,packet) {
+        assert(workerId);
+        
+        this._workers[workerId].send(packet);
+    },
+
+
+
+    sendAll: function(packet){
+
+
+        /*for (var i in this._workers) {
+            (function(id){
+                var self = this;
+                process.nextTick(function(){
+                    this._workers[i].send(packet);
+                }).bind(this);
+
+            }).call(this,i);
+
+        }*/
+
+        for (var i in this._workers) {
+            (function(id){
+                var self = this;
+                process.nextTick(function(){
+                    //this._workers[i].send(packet);
+                    this._workers[id].send(packet);
+                }.bind(this));
+
+            }).call(this,i);
+
         }
-        Object.keys(Cluster.workers).forEach(function(id) {
-            Cluster.workers[id].send(packet);
-        });
+
+
     }
 });
