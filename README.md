@@ -37,26 +37,25 @@ let rows = await Garam.getDB('testDB').getModel('testModel').insertQuery(req.use
 let model = await Garam.getDB('testRedis').getModel('CpuInfo').addData(ip,port,data);
 
 ### 클러스터 옵션
-``
-"portInfo":{
- "mode" :"number", 
- "maxCount":2,
- "portType" : 0,
- "defaultPort" : 8230
-},
-``
-``
-"portInfo":{
-"mode" :"cpu",
-"portType" : 0,
-"de*faultPort" : 8230
-},
-``
 
-``
-"portInfo":{
-"mode" :"cpu",
-"portType" : 1,
-"de*faultPort" : 8230
-},
-``
+>portInfo":{
+> "mode" :"number",
+> "maxCount":2,
+> "portType" : 0,
+> "defaultPort" : 8230
+>},
+
+
+>"portInfo":{
+>  "mode" :"cpu",
+>  "portType" : 0,
+>  "defaultPort" : 8230
+> },
+
+
+
+>"portInfo":{
+> "mode" :"cpu",
+> "portType" : 1,
+> "de*faultPort" : 8230
+>},
