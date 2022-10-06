@@ -25,4 +25,13 @@ express 3.X , express 4.x 를 지원하며
 node app.js
 node app.js -p 8080  -s false // 클러스터로 기동
 
-![ScreenShot](https://lh4.googleusercontent.com/-iG9gNAXPOjY/U9ibCDiLFBI/AAAAAAAAAGI/4PCGlJ-kZ2Y/w1064-h822-no/Cluster+Chart+-+New+Page.png)
+### DATABASE MYSQL
+
+let rows = await Garam.getDB('testDB').getModel('testModel').getTestQuery(req.user_id);
+
+let rows = await Garam.getDB('testDB').getModel('testModel').insertQuery(req.user_id);
+
+
+### DATABASE REIDS
+
+let model = await Garam.getDB('testRedis').getModel('CpuInfo').addData(ip,port,data);
